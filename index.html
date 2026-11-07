@@ -51,11 +51,10 @@ main{position:relative;z-index:5}
 /* ---------- cursor ---------- */
 .c-dot,.c-ring{position:fixed;top:0;left:0;pointer-events:none;z-index:200;border-radius:50%;opacity:0;transition:opacity .3s;will-change:transform;contain:layout style}
 .c-dot{width:6px;height:6px;margin:-3px 0 0 -3px;background:#fff;box-shadow:var(--glow)}
-.c-ring{width:38px;height:38px;margin:-19px 0 0 -19px;border:1px solid rgba(255,255,255,.7);box-shadow:0 0 12px rgba(255,255,255,.35),inset 0 0 12px rgba(255,255,255,.2);transition:width .25s,height .25s,margin .25s,background .25s,opacity .3s,border-color .25s,scale .15s}
+.c-ring{width:38px;height:38px;margin:-19px 0 0 -19px;border:1px solid rgba(255,255,255,.7);box-shadow:0 0 12px rgba(255,255,255,.35),inset 0 0 12px rgba(255,255,255,.2);transition:width .25s,height .25s,margin .25s,background .25s,opacity .3s,border-color .25s}
 body.cursor-on .c-dot,body.cursor-on .c-ring{opacity:1}
 .c-ring.hover{width:70px;height:70px;margin:-35px 0 0 -35px;background:rgba(255,255,255,.08);border-color:#fff}
 .c-ring.text{width:4px;height:30px;margin:-15px 0 0 -2px;border-radius:2px;background:#fff}
-.c-ring.down{scale:.7}
 
 /* ---------- typography / atoms ---------- */
 .glowtxt{text-shadow:var(--glow)}
@@ -719,12 +718,17 @@ function shake(el = $('#stage')) { el.classList.remove('shake'); void el.offsetW
   let rx = innerWidth / 2, ry = innerHeight / 2, x = rx, y = ry;
   addEventListener('pointermove', e => { x = e.clientX; y = e.clientY; dot.style.transform = `translate3d(${x}px,${y}px,0)`; }, { passive: true });
   // time-based easing: same feel at 60/144 Hz, and no style writes once the ring has caught up
-  let last = performance.now();
+  // the press "squeeze" lives in this same transform, after the translate: a separate CSS
+  // `scale` is applied before `transform` and would shrink the position too (the ring jumped)
+  let last = performance.now(), s = 1, sTo = 1;
   const loop = now => {
-    const k = 1 - Math.exp(-(now - last) / 28); last = now;
-    if (Math.abs(x - rx) > .1 || Math.abs(y - ry) > .1) {
+    const dt = now - last; last = now;
+    const k = 1 - Math.exp(-dt / 28), ks = 1 - Math.exp(-dt / 45);
+    const moving = Math.abs(x - rx) > .1 || Math.abs(y - ry) > .1, squeezing = Math.abs(sTo - s) > .002;
+    if (moving || squeezing) {
       rx += (x - rx) * k; ry += (y - ry) * k;
-      ring.style.transform = `translate3d(${rx}px,${ry}px,0)`;
+      s = squeezing ? s + (sTo - s) * ks : sTo;
+      ring.style.transform = `translate3d(${rx}px,${ry}px,0) scale(${s})`;
     }
     requestAnimationFrame(loop);
   };
@@ -734,8 +738,11 @@ function shake(el = $('#stage')) { el.classList.remove('shake'); void el.offsetW
     ring.classList.toggle('text', !!t.closest('input'));
     ring.classList.toggle('hover', !t.closest('input') && !!t.closest('a,button,summary,.team-card'));
   });
-  addEventListener('pointerdown', () => ring.classList.add('down'));
-  addEventListener('pointerup', () => ring.classList.remove('down'));
+  const release = () => { sTo = 1; };
+  addEventListener('pointerdown', e => { if (e.button === 0) sTo = .7; });
+  addEventListener('pointerup', release);
+  addEventListener('pointercancel', release);
+  addEventListener('blur', release);
 })();
 
 /* ---------- magnetic buttons ---------- */
