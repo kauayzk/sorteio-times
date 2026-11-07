@@ -40,21 +40,22 @@ button,input{font:inherit;color:inherit}
 #bg{position:fixed;inset:0;z-index:1;pointer-events:none}
 .grain{position:fixed;inset:-50%;z-index:3;pointer-events:none;opacity:.07;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  animation:grain 1s steps(6) infinite}
+  animation:grain 1s steps(6) infinite;will-change:transform}
+#bg,.scan,.vignette{transform:translateZ(0)}
 @keyframes grain{0%{transform:translate(0,0)}20%{transform:translate(-4%,3%)}40%{transform:translate(3%,-5%)}60%{transform:translate(-2%,6%)}80%{transform:translate(5%,2%)}100%{transform:translate(0,0)}}
 .scan{position:fixed;inset:0;z-index:3;pointer-events:none;background:repeating-linear-gradient(to bottom,rgba(255,255,255,.025) 0 1px,transparent 1px 3px)}
 .vignette{position:fixed;inset:0;z-index:2;pointer-events:none;background:radial-gradient(ellipse at center,transparent 45%,rgba(0,0,0,.85) 100%)}
 main{position:relative;z-index:5}
-#progress{position:fixed;top:0;left:0;height:2px;width:0;background:#fff;box-shadow:var(--glow);z-index:60}
+#progress{position:fixed;top:0;left:0;height:2px;width:100%;transform:scaleX(0);transform-origin:left;will-change:transform;background:#fff;box-shadow:var(--glow);z-index:60}
 
 /* ---------- cursor ---------- */
-.c-dot,.c-ring{position:fixed;top:0;left:0;pointer-events:none;z-index:200;border-radius:50%;opacity:0;transition:opacity .3s}
+.c-dot,.c-ring{position:fixed;top:0;left:0;pointer-events:none;z-index:200;border-radius:50%;opacity:0;transition:opacity .3s;will-change:transform;contain:layout style}
 .c-dot{width:6px;height:6px;margin:-3px 0 0 -3px;background:#fff;box-shadow:var(--glow)}
-.c-ring{width:38px;height:38px;margin:-19px 0 0 -19px;border:1px solid rgba(255,255,255,.7);box-shadow:0 0 12px rgba(255,255,255,.35),inset 0 0 12px rgba(255,255,255,.2);transition:width .25s,height .25s,margin .25s,background .25s,opacity .3s,border-color .25s}
+.c-ring{width:38px;height:38px;margin:-19px 0 0 -19px;border:1px solid rgba(255,255,255,.7);box-shadow:0 0 12px rgba(255,255,255,.35),inset 0 0 12px rgba(255,255,255,.2);transition:width .25s,height .25s,margin .25s,background .25s,opacity .3s,border-color .25s,scale .15s}
 body.cursor-on .c-dot,body.cursor-on .c-ring{opacity:1}
 .c-ring.hover{width:70px;height:70px;margin:-35px 0 0 -35px;background:rgba(255,255,255,.08);border-color:#fff}
 .c-ring.text{width:4px;height:30px;margin:-15px 0 0 -2px;border-radius:2px;background:#fff}
-.c-ring.down{transform:scale(.7)!important}
+.c-ring.down{scale:.7}
 
 /* ---------- typography / atoms ---------- */
 .glowtxt{text-shadow:var(--glow)}
@@ -73,7 +74,7 @@ body.cursor-on .c-dot,body.cursor-on .c-ring{opacity:1}
 
 /* ---------- hero ---------- */
 .hero{min-height:100vh;min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:100px 16px 80px;position:relative}
-.hero-inner{will-change:transform,opacity}
+.hero-inner{will-change:transform,opacity,filter}
 .hero .kicker{margin-bottom:28px}
 .hero .pre{font-family:var(--display);font-weight:300;font-size:clamp(16px,3.2vw,30px);letter-spacing:.9em;margin-right:-.9em;color:#fff;text-shadow:var(--glow-sm);margin-bottom:6px}
 .title{font-family:var(--display);font-weight:900;font-size:clamp(44px,13vw,230px);line-height:.88;letter-spacing:-.02em;position:relative;text-shadow:var(--glow);white-space:nowrap}
@@ -629,7 +630,7 @@ const fx = { speed: 1, target: 1, mx: -9999, my: -9999, bursts: [] };
   const cv = $('#bg'), ctx = cv.getContext('2d');
   let W, H, dpr, pts = [];
   const resize = () => {
-    dpr = Math.min(2, devicePixelRatio || 1);
+    dpr = Math.min(1.5, devicePixelRatio || 1);
     W = innerWidth; H = innerHeight;
     cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + 'px'; cv.style.height = H + 'px';
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -637,7 +638,7 @@ const fx = { speed: 1, target: 1, mx: -9999, my: -9999, bursts: [] };
     pts = Array.from({ length: n }, () => ({ x: Math.random() * W, y: Math.random() * H, vx: (Math.random() - .5) * .3, vy: (Math.random() - .5) * .3 - .08, r: Math.random() * 1.4 + .3 }));
   };
   resize(); addEventListener('resize', resize);
-  const LINK = 120;
+  const LINK = 120, BUCKETS = 10;
   const frame = () => {
     fx.speed += (fx.target - fx.speed) * .06;
     ctx.clearRect(0, 0, W, H);
@@ -648,35 +649,44 @@ const fx = { speed: 1, target: 1, mx: -9999, my: -9999, bursts: [] };
       if (p.x < -10) p.x = W + 10; else if (p.x > W + 10) p.x = -10;
       if (p.y < -10) p.y = H + 10; else if (p.y > H + 10) p.y = -10;
     }
-    ctx.lineWidth = 1;
+    // lines are grouped into a few opacity buckets so each bucket is one stroke call
+    // instead of one call per line (thousands per frame)
+    const links = Array.from({ length: BUCKETS }, () => new Path2D());
+    const mlinks = Array.from({ length: BUCKETS }, () => new Path2D());
+    const bucket = f => Math.min(BUCKETS - 1, (f * BUCKETS) | 0);
     for (let i = 0; i < pts.length; i++) {
       const a = pts[i];
       for (let j = i + 1; j < pts.length; j++) {
         const b = pts[j], dx = a.x - b.x, dy = a.y - b.y, d2 = dx * dx + dy * dy;
-        if (d2 < LINK * LINK) {
-          ctx.strokeStyle = `rgba(255,255,255,${(1 - Math.sqrt(d2) / LINK) * .14})`;
-          ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
-        }
+        if (d2 < LINK * LINK) { const pth = links[bucket(1 - Math.sqrt(d2) / LINK)]; pth.moveTo(a.x, a.y); pth.lineTo(b.x, b.y); }
       }
-      const md = Math.hypot(a.x - fx.mx, a.y - fx.my);
-      if (md < 170) {
-        ctx.strokeStyle = `rgba(255,255,255,${(1 - md / 170) * .35})`;
-        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(fx.mx, fx.my); ctx.stroke();
-      }
+      const mdx = a.x - fx.mx, mdy = a.y - fx.my, md2 = mdx * mdx + mdy * mdy;
+      if (md2 < 28900) { const pth = mlinks[bucket(1 - Math.sqrt(md2) / 170)]; pth.moveTo(a.x, a.y); pth.lineTo(fx.mx, fx.my); }
+    }
+    ctx.lineWidth = 1;
+    for (let k = 0; k < BUCKETS; k++) {
+      const f = (k + .5) / BUCKETS;
+      ctx.strokeStyle = `rgba(255,255,255,${f * .14})`; ctx.stroke(links[k]);
+      ctx.strokeStyle = `rgba(255,255,255,${f * .35})`; ctx.stroke(mlinks[k]);
     }
     const stretch = Math.min(14, (fx.speed - 1) * 1.6);
+    const dots = new Path2D();
     for (const p of pts) {
-      ctx.fillStyle = 'rgba(255,255,255,.75)';
-      if (stretch > 1) { ctx.fillRect(p.x - p.r / 2, p.y - stretch, p.r, stretch); }
-      else { ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.283); ctx.fill(); }
+      if (stretch > 1) dots.rect(p.x - p.r / 2, p.y - stretch, p.r, stretch);
+      else { dots.moveTo(p.x + p.r, p.y); dots.arc(p.x, p.y, p.r, 0, 6.283); }
     }
+    ctx.fillStyle = 'rgba(255,255,255,.75)'; ctx.fill(dots);
     // bursts
-    for (let i = fx.bursts.length - 1; i >= 0; i--) {
-      const b = fx.bursts[i];
-      b.x += b.vx; b.y += b.vy; b.vx *= .96; b.vy = b.vy * .96 + .05; b.life -= b.decay;
-      if (b.life <= 0) { fx.bursts.splice(i, 1); continue; }
-      ctx.fillStyle = `rgba(255,255,255,${b.life})`;
-      ctx.beginPath(); ctx.arc(b.x, b.y, b.r * b.life + .3, 0, 6.283); ctx.fill();
+    if (fx.bursts.length) {
+      const bp = Array.from({ length: BUCKETS }, () => new Path2D());
+      for (let i = fx.bursts.length - 1; i >= 0; i--) {
+        const b = fx.bursts[i];
+        b.x += b.vx; b.y += b.vy; b.vx *= .96; b.vy = b.vy * .96 + .05; b.life -= b.decay;
+        if (b.life <= 0) { fx.bursts.splice(i, 1); continue; }
+        const r = b.r * b.life + .3, pth = bp[bucket(b.life)];
+        pth.moveTo(b.x + r, b.y); pth.arc(b.x, b.y, r, 0, 6.283);
+      }
+      for (let k = 0; k < BUCKETS; k++) { ctx.fillStyle = `rgba(255,255,255,${(k + .5) / BUCKETS})`; ctx.fill(bp[k]); }
     }
     requestAnimationFrame(frame);
   };
@@ -707,9 +717,18 @@ function shake(el = $('#stage')) { el.classList.remove('shake'); void el.offsetW
   document.body.classList.add('cursor-on');
   const dot = $('#cDot'), ring = $('#cRing');
   let rx = innerWidth / 2, ry = innerHeight / 2, x = rx, y = ry;
-  addEventListener('pointermove', e => { x = e.clientX; y = e.clientY; dot.style.transform = `translate(${x}px,${y}px)`; }, { passive: true });
-  const loop = () => { rx += (x - rx) * .18; ry += (y - ry) * .18; ring.style.transform = `translate(${rx}px,${ry}px)`; requestAnimationFrame(loop); };
-  loop();
+  addEventListener('pointermove', e => { x = e.clientX; y = e.clientY; dot.style.transform = `translate3d(${x}px,${y}px,0)`; }, { passive: true });
+  // time-based easing: same feel at 60/144 Hz, and no style writes once the ring has caught up
+  let last = performance.now();
+  const loop = now => {
+    const k = 1 - Math.exp(-(now - last) / 28); last = now;
+    if (Math.abs(x - rx) > .1 || Math.abs(y - ry) > .1) {
+      rx += (x - rx) * k; ry += (y - ry) * k;
+      ring.style.transform = `translate3d(${rx}px,${ry}px,0)`;
+    }
+    requestAnimationFrame(loop);
+  };
+  requestAnimationFrame(loop);
   document.addEventListener('pointerover', e => {
     const t = e.target;
     ring.classList.toggle('text', !!t.closest('input'));
@@ -742,11 +761,18 @@ function magnetize(el) {
   const html = Array(4).fill(words.map((w, i) => `<span class="${i % 2 ? 'o' : 's'}">${w}</span><span class="o">✦</span>`).join('')).join('');
   const tracks = [$('#mq1'), $('#mq2')];
   tracks.forEach(t => t.innerHTML = html);
-  let off = 0, lastY = scrollY, vel = 0;
+  let off = 0, lastY = scrollY, vel = 0, w = 1;
+  // measuring scrollWidth every frame forced a layout pass; measure only when the size can change
+  const measure = () => { w = tracks[0].scrollWidth / 4 || 1; };
+  measure(); addEventListener('resize', measure);
+  if (document.fonts) document.fonts.ready.then(measure);
+  const visible = new Set();
+  const vis = new IntersectionObserver(es => es.forEach(e => e.isIntersecting ? visible.add(e.target) : visible.delete(e.target)));
+  tracks.forEach(t => vis.observe(t.parentElement));
   const loop = () => {
     const y = scrollY; vel += ((y - lastY) - vel) * .1; lastY = y;
     off += 0.6 + Math.abs(vel) * .35;
-    const w = tracks[0].scrollWidth / 4;
+    if (!visible.size) { requestAnimationFrame(loop); return; }
     const o = off % w;
     tracks[0].style.transform = `translateX(${-o}px) skewX(${Math.max(-12, Math.min(12, -vel * .4))}deg)`;
     tracks[1].style.transform = `translateX(${o - w}px) skewX(${Math.max(-12, Math.min(12, vel * .4))}deg)`;
@@ -758,15 +784,24 @@ function magnetize(el) {
 /* ---------- scroll: progress, parallax, reveals ---------- */
 (function scrollFx() {
   const prog = $('#progress'), hero = $('#heroInner');
-  const onScroll = () => {
-    const max = document.documentElement.scrollHeight - innerHeight;
-    prog.style.width = (max > 0 ? scrollY / max * 100 : 0) + '%';
-    const h = innerHeight, p = Math.min(1, scrollY / h);
-    hero.style.transform = `translateY(${scrollY * .35}px) scale(${1 - p * .12})`;
+  // page height is cached (reading scrollHeight on every scroll event forced layout),
+  // work is batched to one update per frame, and the hero stops updating once it is off screen
+  let maxScroll = 1, queued = false, heroDone = false;
+  const measure = () => { maxScroll = Math.max(1, document.documentElement.scrollHeight - innerHeight); };
+  new ResizeObserver(measure).observe(document.body); addEventListener('resize', measure); measure();
+  const update = () => {
+    queued = false;
+    const y = scrollY;
+    prog.style.transform = `scaleX(${Math.min(1, y / maxScroll)})`;
+    const p = Math.min(1, y / innerHeight);
+    if (p >= 1 && heroDone) return;
+    heroDone = p >= 1;
+    hero.style.transform = `translate3d(0,${y * .35}px,0) scale(${1 - p * .12})`;
     hero.style.opacity = 1 - p * 1.1;
-    hero.style.filter = `blur(${p * 8}px)`;
+    hero.style.filter = p > .002 ? `blur(${p * 8}px)` : 'none';
   };
-  addEventListener('scroll', onScroll, { passive: true }); onScroll();
+  const onScroll = () => { if (!queued) { queued = true; requestAnimationFrame(update); } };
+  addEventListener('scroll', onScroll, { passive: true }); update();
   const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .12 });
   window.observeReveal = el => io.observe(el);
   $$('.reveal').forEach(el => io.observe(el));
@@ -1373,14 +1408,18 @@ const toggleFs = () => {
 };
 fsBtn.onclick = toggleFs;
 let idleT;
+let idle = false;
 function bumpIdle() {
-  stage.classList.remove('idle'); document.body.classList.remove('fsidle');
+  // runs on every pointermove: only touch classes when something actually changes
+  if (!idle && !stage.classList.contains('fs')) return;
+  if (idle) { idle = false; stage.classList.remove('idle'); document.body.classList.remove('fsidle'); }
   clearTimeout(idleT);
-  if (stage.classList.contains('fs')) idleT = setTimeout(() => { stage.classList.add('idle'); document.body.classList.add('fsidle'); }, 2500);
+  if (stage.classList.contains('fs')) idleT = setTimeout(() => { idle = true; stage.classList.add('idle'); document.body.classList.add('fsidle'); }, 2500);
 }
 document.addEventListener('fullscreenchange', () => {
   const on = !!document.fullscreenElement;
   fsBtn.classList.toggle('on', on); stage.classList.toggle('fs', on);
+  if (!on) { idle = false; clearTimeout(idleT); stage.classList.remove('idle'); document.body.classList.remove('fsidle'); }
   bumpIdle();
 });
 addEventListener('pointermove', bumpIdle, { passive: true });
