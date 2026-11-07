@@ -9,7 +9,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Sorteios WEAK GG">
 <meta property="og:title" content="Sorteios WEAK GG">
-<meta property="og:description" content="Sorteio de times ao vivo, lacrado e verificável — 4 cabeças de chave, 4 estrelas, 8 jogadores. Creation of KZK.">
+<meta property="og:description" content="Sorteio de times ao vivo, lacrado e verificável — 4 cabeças de chave, 8 estrelas, 4 jogadores. Creation of KZK.">
 <meta property="og:image" content="/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -359,7 +359,7 @@ body.fsidle .c-dot,body.fsidle .c-ring{opacity:0!important}
       <div class="kicker" id="heroKicker">// sistema de sorteio imparcial</div>
       <div class="pre">SORTEIOS</div>
       <h1 class="title glitch" data-text="WEAK GG" id="title">WEAK GG</h1>
-      <p class="spec"><b>4</b> times · <b>4</b> cabeças de chave · <b>4</b> estrelas · <b>8</b> jogadores</p>
+      <p class="spec"><b>4</b> times · <b>4</b> cabeças de chave · <b>8</b> estrelas · <b>4</b> jogadores</p>
       <div class="cta"><a href="#setup" class="btn magnetic"><span class="shine"></span>Montar sorteio ↓</a></div>
       <div class="credit-hero">Creation of <b>KZK</b></div>
     </div>
@@ -375,8 +375,8 @@ body.fsidle .c-dot,body.fsidle .c-ring{opacity:0!important}
     </div>
     <div class="steps">
       <div class="step reveal"><div class="n">01</div><h3>Cabeças de chave</h3><p>Cada time já começa com seu cabeça de chave definido por você. Ele é o pilar do time e não entra no sorteio.</p></div>
-      <div class="step reveal" style="transition-delay:.1s"><div class="n">02</div><h3>Rodada das estrelas</h3><p>Os 4 jogadores estrela são sorteados primeiro — exatamente um por time. Assim nenhum time fica com duas estrelas.</p></div>
-      <div class="step reveal" style="transition-delay:.2s"><div class="n">03</div><h3>Rodadas finais</h3><p>Os 8 jogadores restantes são sorteados em 2 rodadas, um por time em cada. A ordem dos times também é sorteada a cada rodada.</p></div>
+      <div class="step reveal" style="transition-delay:.1s"><div class="n">02</div><h3>Rodadas das estrelas</h3><p>Os 8 jogadores estrela são sorteados em 2 rodadas, um por time em cada. Assim todo time termina com exatamente duas estrelas.</p></div>
+      <div class="step reveal" style="transition-delay:.2s"><div class="n">03</div><h3>Rodada final</h3><p>Os 4 jogadores restantes fecham os times, um para cada. A ordem dos times também é sorteada a cada rodada.</p></div>
     </div>
     <div class="fair reveal"><span class="dot"></span><div><b>100% imparcial e verificável.</b> Ao iniciar, o navegador gera uma semente secreta com o gerador criptográfico (<b>crypto.getRandomValues</b>) e mostra para todos o <b>código do sorteio</b> — uma impressão digital SHA-256 da semente e dos nomes. O resultado inteiro sai dessa semente, sem viés. No final a semente é revelada e qualquer pessoa pode conferir aqui embaixo, em <b>Verificar sorteio</b>, que nada foi trocado no meio do caminho.</div></div>
   </section>
@@ -392,10 +392,10 @@ body.fsidle .c-dot,body.fsidle .c-ring{opacity:0!important}
     <div class="sub-h reveal">Times &amp; cabeças de chave <small>4 TIMES</small></div>
     <div class="teams" id="teams"></div>
 
-    <div class="sub-h reveal">Jogadores estrela <small>1 POR TIME</small></div>
+    <div class="sub-h reveal">Jogadores estrela <small>2 POR TIME</small></div>
     <div class="grid-names reveal" id="stars"></div>
 
-    <div class="sub-h reveal">Jogadores <small>2 POR TIME</small></div>
+    <div class="sub-h reveal">Jogadores <small>1 POR TIME</small></div>
     <div class="grid-names reveal" id="players"></div>
 
     <div class="setup-actions reveal">
@@ -482,8 +482,8 @@ body.fsidle .c-dot,body.fsidle .c-ring{opacity:0!important}
     <div class="modal-head"><h3 id="pasteTitle">COLAR LISTA</h3><button class="tool" type="button" data-close>Fechar ✕</button></div>
     <p class="modal-hint">Um nome por linha (ou separados por vírgula). Numeração, marcadores e "@" são removidos sozinhos. Campos vazios aqui não apagam o que já está preenchido.</p>
     <label class="field"><span>Times — formato "Time - Cabeça de chave"</span><textarea id="pTeams" rows="4" placeholder="Alpha Wolves - Kzk&#10;Black Mamba - Vortex&#10;Nocturne - Shadow&#10;Zero Gravity - Nyx"></textarea></label>
-    <label class="field"><span>Jogadores estrela (4)</span><textarea id="pStars" rows="3" placeholder="Blaze, Phantom, Ryuu, Ghost"></textarea></label>
-    <label class="field"><span>Jogadores (8)</span><textarea id="pPlayers" rows="4" placeholder="Lynx&#10;Draco&#10;…"></textarea></label>
+    <label class="field"><span>Jogadores estrela (8)</span><textarea id="pStars" rows="4" placeholder="Blaze, Phantom, Ryuu, Ghost, Lynx, Draco, Hex, Ozzy"></textarea></label>
+    <label class="field"><span>Jogadores (4)</span><textarea id="pPlayers" rows="3" placeholder="Kaito&#10;Rift&#10;…"></textarea></label>
     <div class="modal-actions"><button class="btn" id="pApply" type="button"><span class="shine"></span>Aplicar</button></div>
   </div>
 </div>
@@ -532,7 +532,10 @@ const makeCode = (seed, d) => 'WGG1.' + b64uEncode(JSON.stringify({ seed, teams:
 function readCode(code) {
   if (!code.startsWith('WGG1.')) throw new Error('formato');
   const o = JSON.parse(b64uDecode(code.slice(5)));
-  const ok = typeof o.seed === 'string' && [['teams', 4], ['caps', 4], ['stars', 4], ['players', 8]].every(([k, n]) => Array.isArray(o[k]) && o[k].length === n);
+  // older draws used 4 stars + 8 players; the rounds follow from the list sizes, so both verify
+  const ok = typeof o.seed === 'string' && ['teams', 'caps', 'stars', 'players'].every(k => Array.isArray(o[k]))
+    && o.teams.length === 4 && o.caps.length === 4 && o.stars.length % 4 === 0 && o.players.length % 4 === 0
+    && o.stars.length + o.players.length === 12;
   if (!ok) throw new Error('formato');
   return o;
 }
@@ -543,13 +546,14 @@ async function planDraw(seed, d) {
   const rint = n => { const lim = Math.floor(0x100000000 / n) * n; let x; do { if (p >= st.length) throw new Error('stream'); x = st[p++]; } while (x >= lim); return x % n; };
   const shuf = arr => { const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = rint(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; };
   const pools = { star: [...d.stars], player: [...d.players] };
-  const rounds = ['star', 'player', 'player'].map(type => {
+  const types = [...Array(d.stars.length / 4).fill('star'), ...Array(d.players.length / 4).fill('player')];
+  const rounds = types.map(type => {
     const order = shuf([0, 1, 2, 3]);
     const picks = order.map(ti => { const pool = pools[type], before = [...pool]; return { ti, before, name: pool.splice(rint(pool.length), 1)[0] }; });
     return { type, order, picks };
   });
-  const teams = d.teams.map((name, i) => ({ name, cap: d.caps[i], star: null, players: [] }));
-  rounds.forEach(r => r.picks.forEach(pk => { if (r.type === 'star') teams[pk.ti].star = pk.name; else teams[pk.ti].players.push(pk.name); }));
+  const teams = d.teams.map((name, i) => ({ name, cap: d.caps[i], stars: [], players: [] }));
+  rounds.forEach(r => r.picks.forEach(pk => teams[pk.ti][r.type === 'star' ? 'stars' : 'players'].push(pk.name)));
   return { rounds, teams };
 }
 
@@ -791,8 +795,8 @@ for (let i = 0; i < 4; i++) {
     c.addEventListener('pointerleave', () => { c.style.transform = ''; });
   }
 }
-for (let i = 0; i < 4; i++) starsEl.insertAdjacentHTML('beforeend', `<label class="field star-field"><span>Estrela 0${i + 1}</span><input data-k="star" maxlength="22" placeholder="Nome" autocomplete="off"></label>`);
-for (let i = 0; i < 8; i++) playersEl.insertAdjacentHTML('beforeend', `<label class="field"><span>Jogador 0${i + 1}</span><input data-k="player" maxlength="22" placeholder="Nome" autocomplete="off"></label>`);
+for (let i = 0; i < 8; i++) starsEl.insertAdjacentHTML('beforeend', `<label class="field star-field"><span>Estrela 0${i + 1}</span><input data-k="star" maxlength="22" placeholder="Nome" autocomplete="off"></label>`);
+for (let i = 0; i < 4; i++) playersEl.insertAdjacentHTML('beforeend', `<label class="field"><span>Jogador 0${i + 1}</span><input data-k="player" maxlength="22" placeholder="Nome" autocomplete="off"></label>`);
 $$('.team-card').forEach(c => observeReveal(c));
 $$('.magnetic').forEach(magnetize);
 
@@ -827,8 +831,8 @@ function collect() {
 const DEMO = {
   team: ['Alpha Wolves', 'Black Mamba', 'Nocturne', 'Zero Gravity'],
   cap: ['Kzk', 'Vortex', 'Shadow', 'Nyx'],
-  star: ['Blaze', 'Phantom', 'Ryuu', 'Ghost'],
-  player: ['Lynx', 'Draco', 'Hex', 'Ozzy', 'Kaito', 'Rift', 'Mako', 'Zion']
+  star: ['Blaze', 'Phantom', 'Ryuu', 'Ghost', 'Lynx', 'Draco', 'Hex', 'Ozzy'],
+  player: ['Kaito', 'Rift', 'Mako', 'Zion']
 };
 $('#demoBtn').onclick = () => {
   Object.entries(DEMO).forEach(([k, arr]) => getVals(k).forEach((i, n) => { i.value = arr[n]; i.closest('.field').classList.remove('err'); }));
@@ -842,7 +846,7 @@ $('#clearBtn').onclick = () => {
 $('#startBtn').onclick = () => { const data = collect(); if (data) { saveNames(); Sound.init(); runDraw(data); } };
 
 /* ---------- remember last names (this browser only) ---------- */
-const STORE_KEY = 'weakgg:names:v1';
+const STORE_KEY = 'weakgg:names:v2'; // v1 = old 4 stars / 8 players layout
 let saveT;
 function saveNames() {
   const o = {}; ['team', 'cap', 'star', 'player'].forEach(k => o[k] = getVals(k).map(i => i.value));
@@ -852,7 +856,11 @@ $('#setup').addEventListener('input', () => { clearTimeout(saveT); saveT = setTi
 $('#demoBtn').addEventListener('click', saveNames);
 (function restoreNames() {
   let o = null;
-  try { o = JSON.parse(localStorage.getItem(STORE_KEY) || 'null'); } catch {}
+  try {
+    o = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
+    // from the old layout only teams and seeds still line up
+    if (!o) { const old = JSON.parse(localStorage.getItem('weakgg:names:v1') || 'null'); if (old) o = { team: old.team, cap: old.cap }; }
+  } catch {}
   if (!o) return;
   let any = false;
   ['team', 'cap', 'star', 'player'].forEach(k => getVals(k).forEach((i, n) => { const v = (o[k] || [])[n]; if (typeof v === 'string' && v) { i.value = v; any = true; } }));
@@ -942,7 +950,7 @@ function buildBoards(S) {
       <div class="b-head"><span class="b-num">TIME 0${i + 1}</span><span class="b-name">${esc(t.name)}</span></div>
       <div class="slot cap"><em>C</em><span>???</span></div>
       <div class="slot star"><em>★</em><span>???</span></div>
-      <div class="slot pl"><em>3</em><span>???</span></div>
+      <div class="slot star"><em>★</em><span>???</span></div>
       <div class="slot pl"><em>4</em><span>???</span></div>
     </div>`).join('');
 }
@@ -980,7 +988,7 @@ async function runDraw(data) {
   if (current) current.aborted = true;
   const S = {
     data, aborted: false, done: 0, log: [],
-    teams: data.teams.map((name, i) => ({ name, cap: data.caps[i], star: null, players: [] })),
+    teams: data.teams.map((name, i) => ({ name, cap: data.caps[i], stars: [], players: [] })),
     starPool: [...data.stars], playerPool: [...data.players]
   };
   current = S;
@@ -1024,9 +1032,9 @@ async function runDraw(data) {
     await sleep(900);
 
     const rounds = [
-      { type: 'star', k: 'rodada 1 de 3', t: 'ESTRELAS', s: 'um por time' },
-      { type: 'player', k: 'rodada 2 de 3', t: 'JOGADORES', s: 'segunda escolha' },
-      { type: 'player', k: 'rodada 3 de 3', t: 'JOGADORES', s: 'escolha final' }
+      { type: 'star', k: 'rodada 1 de 3', t: 'ESTRELAS', s: 'primeira estrela' },
+      { type: 'star', k: 'rodada 2 de 3', t: 'ESTRELAS', s: 'segunda estrela' },
+      { type: 'player', k: 'rodada 3 de 3', t: 'JOGADORES', s: 'fechando os times' }
     ];
     for (let r = 0; r < rounds.length; r++) {
       const R = rounds[r];
@@ -1073,7 +1081,7 @@ async function setTarget(S, ti, R) {
   renderPool(S, R.type);
   $('#chFor').style.opacity = 1;
   const t = S.teams[ti];
-  $('#chCap').innerHTML = `Cabeça de chave: <b>${esc(t.cap)}</b>${t.star ? ` · Estrela: <b>${esc(t.star)}</b>` : ''}`;
+  $('#chCap').innerHTML = `Cabeça de chave: <b>${esc(t.cap)}</b>${t.stars.length ? ` · Estrela${t.stars.length > 1 ? 's' : ''}: <b>${t.stars.map(esc).join(', ')}</b>` : ''}`;
   $('#chStatus').textContent = 'aguardando';
   Sound.whoosh();
   $('#chTeam').animate([{ opacity: 0, transform: 'translateY(20px)', filter: 'blur(10px)' }, { opacity: 1, transform: 'none', filter: 'blur(0)' }], { duration: 600, easing: 'cubic-bezier(.2,.8,.2,1)' });
@@ -1184,7 +1192,7 @@ async function doPick(S, ti, R, pick, sleep) {
   // fly to the team board
   const t = S.teams[ti];
   let slot;
-  if (R.type === 'star') { t.star = winner; slot = boardEl(ti).querySelector('.slot.star'); }
+  if (R.type === 'star') { slot = boardEl(ti).querySelectorAll('.slot.star')[t.stars.length]; t.stars.push(winner); }
   else { slot = boardEl(ti).querySelectorAll('.slot.pl')[t.players.length]; t.players.push(winner); }
   await flyTo(winEl, slot, winner);
   slot.classList.add('filled', 'pop'); slot.querySelector('span').textContent = winner;
@@ -1269,7 +1277,7 @@ $('#copyBtn').onclick = async () => {
   S.teams.forEach((t, i) => {
     lines.push(`TIME 0${i + 1} · ${t.name}`);
     lines.push(`  ♛ ${t.cap} (cabeça de chave)`);
-    lines.push(`  ★ ${t.star} (estrela)`);
+    t.stars.forEach(s => lines.push(`  ★ ${s} (estrela)`));
     t.players.forEach(p => lines.push(`  • ${p}`));
     lines.push('');
   });
@@ -1319,12 +1327,12 @@ async function renderImage(S) {
     x.textAlign = 'left'; sp(5); x.font = `600 14px ${M}`; x.fillStyle = 'rgba(255,255,255,.55)'; x.fillText(`TIME 0${i + 1}`, cx + 24, cy + 44);
     sp(0); x.fillStyle = '#fff'; fit(t.name, `900 {s}px ${D}`, 32, cw - 48); glow(14); x.fillText(t.name, cx + 24, cy + 96); flat();
     x.fillStyle = 'rgba(255,255,255,.2)'; x.fillRect(cx + 24, cy + 124, cw - 48, 1);
-    [['C', 'CABEÇA DE CHAVE', t.cap], ['★', 'ESTRELA', t.star], ['3', 'JOGADOR', t.players[0]], ['4', 'JOGADOR', t.players[1]]].forEach(([ic, lab, nm], r) => {
+    [['C', 'CABEÇA DE CHAVE', t.cap], ...t.stars.map(s => ['★', 'ESTRELA', s]), ...t.players.map((p, j) => [String(2 + t.stars.length + j), 'JOGADOR', p])].forEach(([ic, lab, nm], r) => {
       const ry = cy + 152 + r * 80;
       x.fillStyle = '#fff'; glow(10); x.fillRect(cx + 24, ry, 36, 36); flat();
       x.fillStyle = '#000'; x.textAlign = 'center'; sp(0); x.font = `800 18px ${M}`; x.fillText(ic, cx + 42, ry + 25);
       x.textAlign = 'left'; sp(4); x.fillStyle = 'rgba(255,255,255,.5)'; x.font = `400 11px ${M}`; x.fillText(lab, cx + 76, ry + 11);
-      sp(0); x.fillStyle = '#fff'; fit(nm || '', `600 {s}px ${M}`, 24, cw - 100); if (r === 1) glow(12); x.fillText(nm || '', cx + 76, ry + 38); flat();
+      sp(0); x.fillStyle = '#fff'; fit(nm || '', `600 {s}px ${M}`, 24, cw - 100); if (ic === '★') glow(12); x.fillText(nm || '', cx + 76, ry + 38); flat();
     });
   });
 
@@ -1395,7 +1403,7 @@ $('#vBtn').onclick = async () => {
   else if (want.length >= 8 && h.startsWith(want)) { head = '<div class="vbig">✓ SORTEIO VERIFICADO</div>A impressão digital confere: os nomes e a semente são exatamente os que foram lacrados antes do sorteio.'; Sound.init(); Sound.pop(); }
   else head = '<div class="vbig">✕ NÃO CONFERE</div>O código do sorteio informado não bate com este código de verificação. Algo foi alterado — ou o código foi copiado errado.';
   show(`${head}<br><span style="color:var(--dim)">SHA-256: ${fmtHash(h)}</span>
-    <div class="vteams">${plan.teams.map((t, i) => `<div><b>${esc(t.name)}</b>C · ${esc(t.cap)}<br>★ · ${esc(t.star)}<br>3 · ${esc(t.players[0])}<br>4 · ${esc(t.players[1])}</div>`).join('')}</div>`);
+    <div class="vteams">${plan.teams.map((t, i) => `<div><b>${esc(t.name)}</b>C · ${esc(t.cap)}${t.stars.map(s => `<br>★ · ${esc(s)}`).join('')}${t.players.map(p => `<br>• · ${esc(p)}`).join('')}</div>`).join('')}</div>`);
 };
 (function prefillVerify() {
   // opening …#verificar?c=WGG1.…&h=… pre-fills the form

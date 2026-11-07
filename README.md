@@ -46,7 +46,8 @@ e crie no seu provedor de DNS o registro que a Vercel mostrar (CNAME para `cname
 ## Como funciona o sorteio
 
 - Cabeças de chave ficam fixos em cada time.
-- Rodada 1: as 4 estrelas (1 por time). Rodadas 2 e 3: os 8 jogadores (1 por time em cada).
+- Cada time: 1 cabeça de chave + 2 estrelas + 1 jogador.
+- Rodadas 1 e 2: as 8 estrelas (1 por time em cada). Rodada 3: os 4 jogadores (1 por time).
 - A ordem dos times é sorteada a cada rodada.
 
 ### Lacre e verificação
