@@ -45,6 +45,18 @@ e crie no seu provedor de DNS o registro que a Vercel mostrar (CNAME para `cname
 
 ## Como funciona o sorteio
 
+A página tem duas abas em "Monte o sorteio".
+
+### Padrão
+
+- Escolha de 2 a 8 times e cole os nomes (um por linha ou separados por vírgula, até 64).
+- Nomes dos times são opcionais (sem nome vira `TIME 01`, `TIME 02`…).
+- A cada rodada cada time recebe um jogador, com a ordem dos times sorteada de novo.
+  Se a divisão não for exata, os times que ficam com um jogador a mais também são sorteados.
+- Usa o mesmo lacre e a mesma verificação do modo WEAK GG (o código leva `"mode":"std"`).
+
+### WEAK GG
+
 - Cabeças de chave ficam fixos em cada time.
 - Cada time: 1 cabeça de chave + 2 estrelas + 1 jogador.
 - Rodadas 1 e 2: as 8 estrelas (1 por time em cada). Rodada 3: os 4 jogadores (1 por time).
