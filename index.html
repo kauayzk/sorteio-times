@@ -213,7 +213,7 @@ body.staging{overflow:hidden}
 @keyframes readyGlow{50%{box-shadow:var(--box-glow),0 0 80px rgba(255,255,255,.35)}}
 .ch-hint{margin-top:12px;font-size:10px;letter-spacing:.35em;color:var(--dim);text-transform:uppercase}
 
-.boards{position:relative;z-index:2;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:0 22px 24px}
+.boards{position:relative;z-index:2;display:grid;grid-template-columns:repeat(var(--cols,4),1fr);gap:12px;padding:0 22px 24px}
 .board{border:1px solid var(--line);background:rgba(0,0,0,.7);padding:14px;opacity:0;transform:translateY(30px);transition:border-color .4s,box-shadow .4s,transform .6s cubic-bezier(.2,.8,.2,1),opacity .6s}
 .board.in{opacity:1;transform:none}
 .board.active{border-color:#fff;box-shadow:var(--box-glow);transform:translateY(-6px)}
@@ -264,6 +264,27 @@ body.staging{overflow:hidden}
 @keyframes boardFloat{50%{transform:translateY(-8px)}}
 .shake{animation:shake .5s cubic-bezier(.36,.07,.19,.97)}
 @keyframes shake{10%,90%{transform:translate(-2px,1px)}20%,80%{transform:translate(4px,-2px)}30%,50%,70%{transform:translate(-7px,3px)}40%,60%{transform:translate(7px,-3px)}}
+
+/* ---------- mode tabs / standard draw ---------- */
+.tabs{display:flex;border:1px solid var(--line);margin-bottom:8px}
+.tab{flex:1;background:transparent;border:0;padding:20px 22px;text-align:left;color:var(--mute);transition:color .3s,background .3s,box-shadow .3s}
+.tab+.tab{border-left:1px solid var(--line)}
+.tab b{display:block;font-family:var(--display);font-weight:900;font-size:17px;letter-spacing:.12em;color:inherit;margin-bottom:6px}
+.tab small{font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+.tab:hover{color:#fff}
+.tab.on{background:#fff;color:#000;box-shadow:var(--box-glow)}
+.panel.enter{animation:panelIn .6s cubic-bezier(.2,.8,.2,1)}
+@keyframes panelIn{from{opacity:0;transform:translateY(24px);filter:blur(6px)}}
+.count-row{display:flex;flex-wrap:wrap;gap:10px}
+.count-btn{width:64px;height:64px;border:1px solid var(--line);background:transparent;font-family:var(--display);font-weight:900;font-size:22px;transition:background .25s,color .25s,border-color .25s,box-shadow .25s}
+.count-btn:hover{border-color:#fff;box-shadow:0 0 18px rgba(255,255,255,.25)}
+.count-btn.on{background:#fff;color:#000;box-shadow:var(--box-glow)}
+.std-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:10px 34px;align-items:start}
+#stdPlayers{min-height:300px}
+.std-split{margin-top:12px;font-size:12px;letter-spacing:.06em;color:var(--mute);line-height:1.7;min-height:1.7em}
+.std-split b{color:#fff;text-shadow:var(--glow-sm)}
+.std-teamnames{display:grid;grid-template-columns:1fr 1fr;gap:4px 18px}
+.std-teamnames .field{margin-top:6px}
 
 /* ---------- paste modal ---------- */
 .field textarea{width:100%;background:rgba(255,255,255,.02);border:1px solid var(--line);padding:10px 12px;font:inherit;font-size:13px;line-height:1.6;color:#fff;outline:none;resize:vertical;border-radius:0;transition:border-color .3s,box-shadow .3s}
@@ -317,6 +338,7 @@ body.fsidle .c-dot,body.fsidle .c-ring{opacity:0!important}
   .boards{grid-template-columns:repeat(2,1fr)}
   .verify-grid{grid-template-columns:1fr}
   .verify-out .vteams{grid-template-columns:1fr 1fr}
+  .std-grid{grid-template-columns:1fr}
 }
 @media (max-width:600px){
   section.block{padding:90px 16px}
@@ -328,6 +350,10 @@ body.fsidle .c-dot,body.fsidle .c-ring{opacity:0!important}
   .st-tools{margin-left:auto;flex-wrap:wrap;justify-content:flex-end}
   .tool{padding:7px 9px}
   .verify-out .vteams{grid-template-columns:1fr}
+  .tabs{flex-direction:column}
+  .tab+.tab{border-left:0;border-top:1px solid var(--line)}
+  .count-btn{width:52px;height:52px;font-size:18px}
+  .std-teamnames{grid-template-columns:1fr}
   .boards{gap:8px;padding:0 12px 18px}
   .board{padding:10px}
   .slot{font-size:11px;min-height:30px;gap:6px}
@@ -359,7 +385,7 @@ body.fsidle .c-dot,body.fsidle .c-ring{opacity:0!important}
       <div class="kicker" id="heroKicker">// sistema de sorteio imparcial</div>
       <div class="pre">SORTEIOS</div>
       <h1 class="title glitch" data-text="WEAK GG" id="title">WEAK GG</h1>
-      <p class="spec"><b>4</b> times · <b>4</b> cabeças de chave · <b>8</b> estrelas · <b>4</b> jogadores</p>
+      <p class="spec"><b>WEAK GG</b> · cabeças de chave &amp; estrelas &nbsp;/&nbsp; <b>Padrão</b> · de <b>2</b> a <b>8</b> times</p>
       <div class="cta"><a href="#setup" class="btn magnetic"><span class="shine"></span>Montar sorteio ↓</a></div>
       <div class="credit-hero">Creation of <b>KZK</b></div>
     </div>
@@ -389,6 +415,35 @@ body.fsidle .c-dot,body.fsidle .c-ring{opacity:0!important}
       <div class="sec-num">02 / 02</div>
     </div>
 
+    <div class="tabs reveal" role="tablist" aria-label="Tipo de sorteio">
+      <button class="tab on" type="button" role="tab" data-tab="seed" aria-selected="true"><b>WEAK GG</b><small>4 times · cabeças de chave · estrelas</small></button>
+      <button class="tab" type="button" role="tab" data-tab="std" aria-selected="false"><b>PADRÃO</b><small>só os nomes · 2 a 8 times</small></button>
+    </div>
+
+    <div class="panel" id="stdPanel" hidden>
+      <div class="sub-h">Quantos times? <small id="stdCountLbl">2 TIMES</small></div>
+      <div class="count-row" id="stdCount"></div>
+      <div class="std-grid">
+        <div>
+          <div class="sub-h">Jogadores <small id="stdNum">0 NOMES</small></div>
+          <label class="field"><span>Um nome por linha (ou separados por vírgula)</span><textarea id="stdPlayers" rows="12" placeholder="Kzk&#10;Vortex&#10;Shadow&#10;…"></textarea></label>
+          <div class="std-split" id="stdSplit"></div>
+        </div>
+        <div>
+          <div class="sub-h">Nomes dos times <small>OPCIONAL</small></div>
+          <div class="std-teamnames" id="stdTeams"></div>
+        </div>
+      </div>
+      <div class="setup-actions">
+        <div class="left">
+          <button class="btn ghost" id="stdDemo" type="button">Preencher exemplo</button>
+          <button class="btn ghost" id="stdClear" type="button">Limpar tudo</button>
+        </div>
+        <button class="btn go magnetic" id="stdStart" type="button"><span class="shine"></span>Iniciar sorteio ⟶</button>
+      </div>
+    </div>
+
+    <div class="panel" id="seedPanel">
     <div class="sub-h reveal">Times &amp; cabeças de chave <small>4 TIMES</small></div>
     <div class="teams" id="teams"></div>
 
@@ -405,6 +460,7 @@ body.fsidle .c-dot,body.fsidle .c-ring{opacity:0!important}
         <button class="btn ghost" id="clearBtn" type="button">Limpar tudo</button>
       </div>
       <button class="btn go magnetic" id="startBtn" type="button"><span class="shine"></span>Iniciar sorteio ⟶</button>
+    </div>
     </div>
   </section>
 
@@ -501,6 +557,7 @@ const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const wait = ms => new Promise(r => setTimeout(r, ms));
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad2 = n => String(n).padStart(2, '0');
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const finePointer = matchMedia('(pointer: fine)').matches;
 
@@ -528,14 +585,24 @@ const sha256 = async str => new Uint8Array(await crypto.subtle.digest('SHA-256',
 const fmtHash = h => h.toUpperCase().match(/.{1,4}/g).join(' ');
 function b64uEncode(str) { let s = ''; enc.encode(str).forEach(x => s += String.fromCharCode(x)); return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
 function b64uDecode(s) { s = s.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; return new TextDecoder().decode(Uint8Array.from(atob(s), c => c.charCodeAt(0))); }
-const makeCode = (seed, d) => 'WGG1.' + b64uEncode(JSON.stringify({ seed, teams: d.teams, caps: d.caps, stars: d.stars, players: d.players }));
+// standard draws add mode:"std" and carry only {seed, teams, players}
+const makeCode = (seed, d) => 'WGG1.' + b64uEncode(JSON.stringify(d.mode === 'std'
+  ? { mode: 'std', seed, teams: d.teams, players: d.players }
+  : { seed, teams: d.teams, caps: d.caps, stars: d.stars, players: d.players }));
 function readCode(code) {
   if (!code.startsWith('WGG1.')) throw new Error('formato');
   const o = JSON.parse(b64uDecode(code.slice(5)));
-  // older draws used 4 stars + 8 players; the rounds follow from the list sizes, so both verify
-  const ok = typeof o.seed === 'string' && ['teams', 'caps', 'stars', 'players'].every(k => Array.isArray(o[k]))
-    && o.teams.length === 4 && o.caps.length === 4 && o.stars.length % 4 === 0 && o.players.length % 4 === 0
-    && o.stars.length + o.players.length === 12;
+  const strs = a => Array.isArray(a) && a.every(s => typeof s === 'string');
+  let ok;
+  if (o.mode === 'std') {
+    ok = typeof o.seed === 'string' && strs(o.teams) && strs(o.players)
+      && o.teams.length >= 2 && o.teams.length <= 8 && o.players.length >= o.teams.length && o.players.length <= 64;
+  } else {
+    // older draws used 4 stars + 8 players; the rounds follow from the list sizes, so both verify
+    ok = typeof o.seed === 'string' && ['teams', 'caps', 'stars', 'players'].every(k => strs(o[k]))
+      && o.teams.length === 4 && o.caps.length === 4 && o.stars.length % 4 === 0 && o.players.length % 4 === 0
+      && o.stars.length + o.players.length === 12;
+  }
   if (!ok) throw new Error('formato');
   return o;
 }
@@ -545,6 +612,18 @@ async function planDraw(seed, d) {
   let p = 0;
   const rint = n => { const lim = Math.floor(0x100000000 / n) * n; let x; do { if (p >= st.length) throw new Error('stream'); x = st[p++]; } while (x >= lim); return x % n; };
   const shuf = arr => { const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = rint(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  if (d.mode === 'std') {
+    // one pick per team each round, team order shuffled every round; in the last
+    // (partial) round the shuffle also decides which teams get the extra players
+    const T = d.teams.length, pool = [...d.players], rounds = [];
+    while (pool.length) {
+      const order = shuf([...Array(T).keys()]).slice(0, Math.min(T, pool.length));
+      rounds.push({ type: 'player', order, picks: order.map(ti => { const before = [...pool]; return { ti, before, name: pool.splice(rint(pool.length), 1)[0] }; }) });
+    }
+    const teams = d.teams.map(name => ({ name, cap: null, stars: [], players: [] }));
+    rounds.forEach(r => r.picks.forEach(pk => teams[pk.ti].players.push(pk.name)));
+    return { rounds, teams };
+  }
   const pools = { star: [...d.stars], player: [...d.players] };
   const types = [...Array(d.stars.length / 4).fill('star'), ...Array(d.players.length / 4).fill('player')];
   const rounds = types.map(type => {
@@ -842,20 +921,20 @@ for (let i = 0; i < 4; i++) playersEl.insertAdjacentHTML('beforeend', `<label cl
 $$('.team-card').forEach(c => observeReveal(c));
 $$('.magnetic').forEach(magnetize);
 
-$('#setup').addEventListener('input', e => { const f = e.target.closest('.field'); if (f) f.classList.remove('err'); });
-$('#setup').addEventListener('keydown', e => {
+$('#seedPanel').addEventListener('input', e => { const f = e.target.closest('.field'); if (f) f.classList.remove('err'); });
+$('#seedPanel').addEventListener('keydown', e => {
   if (e.key !== 'Enter' || e.target.tagName !== 'INPUT') return;
   e.preventDefault();
-  const all = $$('#setup input'), i = all.indexOf(e.target);
+  const all = $$('#seedPanel input'), i = all.indexOf(e.target);
   if (i < all.length - 1) all[i + 1].focus(); else $('#startBtn').click();
 });
 
 let toastT;
 function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 3200); }
 
-const getVals = k => $$(`#setup input[data-k="${k}"]`);
+const getVals = k => $$(`#seedPanel input[data-k="${k}"]`);
 function collect() {
-  const inputs = $$('#setup input');
+  const inputs = $$('#seedPanel input');
   let ok = true;
   inputs.forEach(i => { i.value = i.value.trim().replace(/\s+/g, ' '); const bad = !i.value; i.closest('.field').classList.toggle('err', bad); if (bad) ok = false; });
   if (!ok) { toast('Preencha todos os campos'); inputs.find(i => !i.value).focus(); return null; }
@@ -881,7 +960,7 @@ $('#demoBtn').onclick = () => {
   toast('Exemplo preenchido');
 };
 $('#clearBtn').onclick = () => {
-  $$('#setup input').forEach(i => { i.value = ''; i.closest('.field').classList.remove('err'); });
+  $$('#seedPanel input').forEach(i => { i.value = ''; i.closest('.field').classList.remove('err'); });
   try { localStorage.removeItem(STORE_KEY); } catch {}
   toast('Campos limpos');
 };
@@ -894,7 +973,7 @@ function saveNames() {
   const o = {}; ['team', 'cap', 'star', 'player'].forEach(k => o[k] = getVals(k).map(i => i.value));
   try { localStorage.setItem(STORE_KEY, JSON.stringify(o)); } catch {}
 }
-$('#setup').addEventListener('input', () => { clearTimeout(saveT); saveT = setTimeout(saveNames, 300); });
+$('#seedPanel').addEventListener('input', () => { clearTimeout(saveT); saveT = setTimeout(saveNames, 300); });
 $('#demoBtn').addEventListener('click', saveNames);
 (function restoreNames() {
   let o = null;
@@ -926,7 +1005,7 @@ function fillTeams(lines, from = 0) {
   });
 }
 // pasting a multi-line / comma list straight into any field spreads it across that group
-$('#setup').addEventListener('paste', e => {
+$('#seedPanel').addEventListener('paste', e => {
   const inp = e.target.closest('input[data-k]'); if (!inp) return;
   const txt = (e.clipboardData || window.clipboardData).getData('text');
   if (!/[\n,;]/.test(txt.trim())) return;
@@ -950,6 +1029,91 @@ $('#pApply').onclick = () => {
   toast(`Aplicado: ${t.length} times · ${Math.min(4, s.length)} estrelas · ${Math.min(8, p.length)} jogadores`);
   $('#setup').scrollIntoView({ behavior: 'smooth' });
 };
+
+/* ---------- mode tabs ---------- */
+const TAB_KEY = 'weakgg:tab';
+function setTab(t, animate = true) {
+  $$('.tab').forEach(b => { const on = b.dataset.tab === t; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
+  const show = $(t === 'std' ? '#stdPanel' : '#seedPanel');
+  $(t === 'std' ? '#seedPanel' : '#stdPanel').hidden = true;
+  show.hidden = false;
+  if (animate && !reduced) { show.classList.remove('enter'); void show.offsetWidth; show.classList.add('enter'); }
+  $$('.reveal', show).forEach(el => observeReveal(el));
+  try { localStorage.setItem(TAB_KEY, t); } catch {}
+}
+$$('.tab').forEach(b => b.onclick = () => { if (!b.classList.contains('on')) { Sound.init(); Sound.whoosh(); setTab(b.dataset.tab); } });
+
+/* ---------- standard draw: any number of names split across 2–8 teams ---------- */
+const STD_KEY = 'weakgg:std:v1', STD_MAX = 64;
+const std = { n: 2 };
+const stdTeamInputs = () => $$('#stdTeams input');
+$('#stdCount').innerHTML = [2, 3, 4, 5, 6, 7, 8].map(n => `<button class="count-btn" type="button" data-n="${n}">${n}</button>`).join('');
+function setStdCount(n, names) {
+  const keep = names || stdTeamInputs().map(i => i.value);
+  std.n = n;
+  $$('#stdCount .count-btn').forEach(b => b.classList.toggle('on', +b.dataset.n === n));
+  $('#stdCountLbl').textContent = `${n} TIMES`;
+  $('#stdTeams').innerHTML = Array.from({ length: n }, (_, i) =>
+    `<label class="field"><span>Time ${pad2(i + 1)}</span><input maxlength="22" placeholder="TIME ${pad2(i + 1)}" autocomplete="off" value="${esc(keep[i] || '')}"></label>`).join('');
+  updateStdSplit();
+}
+const stdNames = () => splitList($('#stdPlayers').value);
+function updateStdSplit() {
+  const N = stdNames().length, T = std.n, el = $('#stdSplit');
+  $('#stdNum').textContent = `${N} ${N === 1 ? 'NOME' : 'NOMES'}`;
+  if (N > STD_MAX) { el.innerHTML = `Máximo de <b>${STD_MAX}</b> nomes por sorteio.`; return; }
+  if (N < T) { el.innerHTML = N ? `Faltam <b>${T - N}</b> ${T - N > 1 ? 'nomes' : 'nome'} para ter pelo menos 1 por time.` : 'Cole ou digite os nomes dos jogadores.'; return; }
+  const base = Math.floor(N / T), extra = N % T;
+  el.innerHTML = extra
+    ? `<b>${extra}</b> ${extra > 1 ? 'times' : 'time'} com <b>${base + 1}</b> e <b>${T - extra}</b> com <b>${base}</b> — quem fica com o jogador a mais também é sorteado.`
+    : `<b>${T}</b> times de <b>${base}</b> ${base > 1 ? 'jogadores' : 'jogador'}.`;
+}
+function saveStd() {
+  try { localStorage.setItem(STD_KEY, JSON.stringify({ n: std.n, teams: stdTeamInputs().map(i => i.value), players: $('#stdPlayers').value })); } catch {}
+}
+let stdSaveT;
+$('#stdPanel').addEventListener('input', e => {
+  const f = e.target.closest('.field'); if (f) f.classList.remove('err');
+  if (e.target.id === 'stdPlayers') updateStdSplit();
+  clearTimeout(stdSaveT); stdSaveT = setTimeout(saveStd, 300);
+});
+$('#stdCount').addEventListener('click', e => {
+  const b = e.target.closest('.count-btn'); if (!b) return;
+  Sound.init(); Sound.pop();
+  setStdCount(+b.dataset.n); saveStd();
+});
+function collectStd() {
+  const names = stdNames(), T = std.n, area = $('#stdPlayers').closest('.field');
+  const fail = msg => { area.classList.add('err'); toast(msg); $('#stdPlayers').focus(); return null; };
+  if (names.length < T) return fail(`Coloque pelo menos ${T} nomes (1 por time)`);
+  if (names.length > STD_MAX) return fail(`Máximo de ${STD_MAX} nomes`);
+  const seen = new Set();
+  for (const n of names) { const k = n.toLowerCase(); if (seen.has(k)) return fail(`Nome repetido: ${n}`); seen.add(k); }
+  const teams = stdTeamInputs().map((i, n) => i.value.trim().replace(/\s+/g, ' ') || `TIME ${pad2(n + 1)}`);
+  const tseen = new Set();
+  for (const t of teams) { const k = t.toLowerCase(); if (tseen.has(k)) { toast(`Nome de time repetido: ${t}`); return null; } tseen.add(k); }
+  return { mode: 'std', teams, players: names };
+}
+$('#stdStart').onclick = () => { const data = collectStd(); if (data) { saveStd(); Sound.init(); runDraw(data); } };
+$('#stdDemo').onclick = () => {
+  $('#stdPlayers').value = ['Kzk', 'Vortex', 'Shadow', 'Nyx', 'Blaze', 'Phantom', 'Ryuu', 'Ghost', 'Lynx', 'Draco', 'Hex', 'Ozzy', 'Kaito', 'Rift'].join('\n');
+  $('#stdPlayers').closest('.field').classList.remove('err');
+  setStdCount(4, []); saveStd(); toast('Exemplo preenchido');
+};
+$('#stdClear').onclick = () => {
+  $('#stdPlayers').value = ''; setStdCount(std.n, []);
+  try { localStorage.removeItem(STD_KEY); } catch {}
+  toast('Campos limpos');
+};
+(function restoreStd() {
+  let o = null;
+  try { o = JSON.parse(localStorage.getItem(STD_KEY) || 'null'); } catch {}
+  if (o && typeof o.players === 'string') $('#stdPlayers').value = o.players;
+  setStdCount(o && o.n >= 2 && o.n <= 8 ? o.n : 2, o && Array.isArray(o.teams) ? o.teams : []);
+  let t = 'seed';
+  try { t = localStorage.getItem(TAB_KEY) === 'std' ? 'std' : 'seed'; } catch {}
+  setTab(t, false);
+})();
 
 /* ================= DRAW ENGINE ================= */
 const stage = $('#stage'), strip = $('#strip'), reelWrap = $('#reelWrap'), revealBtn = $('#revealBtn');
@@ -987,13 +1151,15 @@ async function bigMsg(k, t, s, hold = 1300) {
 
 function buildBoards(S) {
   const b = $('#boards');
+  // every team shows the same number of empty slots, so an uneven split isn't given away early
+  const nStar = S.plan.teams[0].stars.length, nPl = Math.max(...S.plan.teams.map(t => t.players.length));
+  b.style.setProperty('--cols', Math.min(S.teams.length, 4));
   b.innerHTML = S.teams.map((t, i) => `
     <div class="board" data-i="${i}">
-      <div class="b-head"><span class="b-num">TIME 0${i + 1}</span><span class="b-name">${esc(t.name)}</span></div>
-      <div class="slot cap"><em>C</em><span>???</span></div>
-      <div class="slot star"><em>★</em><span>???</span></div>
-      <div class="slot star"><em>★</em><span>???</span></div>
-      <div class="slot pl"><em>4</em><span>???</span></div>
+      <div class="b-head"><span class="b-num">TIME ${pad2(i + 1)}</span><span class="b-name">${esc(t.name)}</span></div>
+      ${t.cap ? '<div class="slot cap"><em>C</em><span>???</span></div>' : ''}
+      ${'<div class="slot star"><em>★</em><span>???</span></div>'.repeat(nStar)}
+      ${Array.from({ length: nPl }, (_, j) => `<div class="slot pl"><em>${(t.cap ? 1 : 0) + nStar + j + 1}</em><span>???</span></div>`).join('')}
     </div>`).join('');
 }
 const boardEl = i => $(`#boards .board[data-i="${i}"]`);
@@ -1006,7 +1172,7 @@ function renderPool(S, type) {
 const chipFor = n => $$('#pool .chip').find(c => c.dataset.n === n);
 
 function setProgress(S) {
-  $('#stProg').style.width = (S.done / 12 * 100) + '%';
+  $('#stProg').style.width = (S.done / (S.total || 12) * 100) + '%';
 }
 
 function waitReveal(S) {
@@ -1030,8 +1196,9 @@ async function runDraw(data) {
   if (current) current.aborted = true;
   const S = {
     data, aborted: false, done: 0, log: [],
-    teams: data.teams.map((name, i) => ({ name, cap: data.caps[i], stars: [], players: [] })),
-    starPool: [...data.stars], playerPool: [...data.players]
+    std: data.mode === 'std',
+    teams: data.teams.map((name, i) => ({ name, cap: data.caps ? data.caps[i] : null, stars: [], players: [] })),
+    starPool: [...(data.stars || [])], playerPool: [...data.players]
   };
   current = S;
   const sleep = async ms => { await wait(ms); if (S.aborted) throw ABORT; };
@@ -1043,6 +1210,7 @@ async function runDraw(data) {
     S.code = makeCode(seed, data);
     S.hash = toHex(await sha256(S.code));
     S.plan = await planDraw(seed, data);
+    S.total = S.plan.rounds.reduce((n, r) => n + r.picks.length, 0);
     if (S.aborted) return;
 
     openStage();
@@ -1063,30 +1231,34 @@ async function runDraw(data) {
     Sound.boom(); flash(.8); burst(innerWidth / 2, innerHeight / 2, 120, 12); shockwave(innerWidth / 2, innerHeight / 2);
     fx.target = 1;
 
-    // captains
-    $('#stRound').textContent = 'CABEÇAS DE CHAVE';
-    for (let i = 0; i < 4; i++) {
+    // teams enter (with their captains in the WEAK GG format)
+    $('#stRound').textContent = S.std ? 'TIMES' : 'CABEÇAS DE CHAVE';
+    for (let i = 0; i < S.teams.length; i++) {
       const b = boardEl(i); b.classList.add('in'); Sound.whoosh();
-      await sleep(260);
+      await sleep(S.std ? 180 : 260);
       const slot = b.querySelector('.slot.cap');
-      slot.classList.add('filled', 'pop'); scramble(slot.querySelector('span'), S.teams[i].cap, 600); Sound.pop();
+      if (slot) { slot.classList.add('filled', 'pop'); scramble(slot.querySelector('span'), S.teams[i].cap, 600); Sound.pop(); }
     }
     await sleep(900);
 
-    const rounds = [
-      { type: 'star', k: 'rodada 1 de 3', t: 'ESTRELAS', s: 'primeira estrela' },
-      { type: 'star', k: 'rodada 2 de 3', t: 'ESTRELAS', s: 'segunda estrela' },
-      { type: 'player', k: 'rodada 3 de 3', t: 'JOGADORES', s: 'fechando os times' }
-    ];
+    const nR = S.plan.rounds.length;
+    const rounds = S.std
+      ? S.plan.rounds.map((pr, r) => ({ type: 'player', k: `rodada ${r + 1} de ${nR}`, t: `RODADA ${r + 1}`,
+          s: r === nR - 1 ? 'fechando os times' : `${pr.picks.length} jogadores` }))
+      : [
+        { type: 'star', k: 'rodada 1 de 3', t: 'ESTRELAS', s: 'primeira estrela' },
+        { type: 'star', k: 'rodada 2 de 3', t: 'ESTRELAS', s: 'segunda estrela' },
+        { type: 'player', k: 'rodada 3 de 3', t: 'JOGADORES', s: 'fechando os times' }
+      ];
     for (let r = 0; r < rounds.length; r++) {
       const R = rounds[r];
       const order = S.plan.rounds[r].order; // team order drawn fresh each round (from the sealed seed)
       S.log.push(`${R.k.toUpperCase()} — ordem dos times sorteada: ${order.map(i => S.teams[i].name).join(' → ')}`);
       Sound.beat();
       await bigMsg(R.k, R.t, R.s, 1500); if (S.aborted) throw ABORT;
-      $('#stRound').textContent = `${R.k.toUpperCase()} · ${R.t}`;
+      $('#stRound').textContent = S.std ? R.k.toUpperCase() : `${R.k.toUpperCase()} · ${R.t}`;
       $('#reelTag').textContent = R.type === 'star' ? '★ JOGADOR ESTRELA' : '◆ JOGADOR';
-      for (let k = 0; k < 4; k++) {
+      for (let k = 0; k < order.length; k++) {
         const ti = order[k];
         await setTarget(S, ti, R);
         await waitReveal(S);
@@ -1123,7 +1295,11 @@ async function setTarget(S, ti, R) {
   renderPool(S, R.type);
   $('#chFor').style.opacity = 1;
   const t = S.teams[ti];
-  $('#chCap').innerHTML = `Cabeça de chave: <b>${esc(t.cap)}</b>${t.stars.length ? ` · Estrela${t.stars.length > 1 ? 's' : ''}: <b>${t.stars.map(esc).join(', ')}</b>` : ''}`;
+  const info = [];
+  if (t.cap) info.push(`Cabeça de chave: <b>${esc(t.cap)}</b>`);
+  if (t.stars.length) info.push(`Estrela${t.stars.length > 1 ? 's' : ''}: <b>${t.stars.map(esc).join(', ')}</b>`);
+  if (S.std) info.push(t.players.length ? `Já tem: <b>${t.players.map(esc).join(', ')}</b>` : 'Primeiro jogador do time');
+  $('#chCap').innerHTML = info.join(' · ');
   $('#chStatus').textContent = 'aguardando';
   Sound.whoosh();
   $('#chTeam').animate([{ opacity: 0, transform: 'translateY(20px)', filter: 'blur(10px)' }, { opacity: 1, transform: 'none', filter: 'blur(0)' }], { duration: 600, easing: 'cubic-bezier(.2,.8,.2,1)' });
@@ -1168,7 +1344,7 @@ async function doPick(S, ti, R, pick, sleep) {
     strip.innerHTML = names.map(nm => `<div class="ri">${esc(nm)}</div>`).join('');
     const h = rh();
     const endY = -(n - 2) * h, overY = endY - h * .44;
-    const dur = (R.type === 'star' ? 6400 : 5600) + rnd(900);
+    const dur = (R.type === 'star' ? 6400 : S.std ? 4800 : 5600) + rnd(900);
     const anim = strip.animate([
       { transform: 'translateY(0px)', easing: 'cubic-bezier(.2,.55,.12,1)' },
       { transform: `translateY(${overY}px)`, offset: .84 },
@@ -1270,6 +1446,7 @@ async function flyTo(fromEl, slot, text) {
 
 async function finale(S) {
   $$('#boards .board').forEach(b => b.classList.remove('active'));
+  $$('#boards .slot:not(.filled)').forEach(s => s.remove()); // teams that ended one player short
   $('#stRound').textContent = 'CONCLUÍDO';
   Sound.fanfare();
   await bigMsg('sorteio', 'FIM', 'times definidos', 1400);
@@ -1307,6 +1484,7 @@ $('#exitBtn').onclick = () => {
   const S = current;
   if (S && !stage.classList.contains('done') && !confirm('Cancelar o sorteio em andamento?')) return;
   if (S) { S.aborted = true; clearTimeout(S.autoT); if (S.rejectReveal) { const r = S.rejectReveal; S.resolveReveal = S.rejectReveal = null; r(ABORT); } }
+  if (S) setTab(S.std ? 'std' : 'seed', false); // come back to the form this draw came from
   current = null;
   closeStage();
   $('#setup').scrollIntoView();
@@ -1317,8 +1495,9 @@ $('#copyBtn').onclick = async () => {
   const S = current; if (!S) return;
   const lines = [`SORTEIOS WEAK GG — ${S.when}`, ''];
   S.teams.forEach((t, i) => {
-    lines.push(`TIME 0${i + 1} · ${t.name}`);
-    lines.push(`  ♛ ${t.cap} (cabeça de chave)`);
+    const label = `TIME ${pad2(i + 1)}`;
+    lines.push(t.name === label ? label : `${label} · ${t.name}`);
+    if (t.cap) lines.push(`  ♛ ${t.cap} (cabeça de chave)`);
     t.stars.forEach(s => lines.push(`  ★ ${s} (estrela)`));
     t.players.forEach(p => lines.push(`  • ${p}`));
     lines.push('');
@@ -1340,7 +1519,17 @@ $('#hashChip').onclick = async () => {
 /* ---------- result image (canvas → PNG) ---------- */
 async function renderImage(S) {
   try { await document.fonts.ready; } catch {}
-  const W = 1600, H = 900, c = document.createElement('canvas');
+  // layout grows with the draw: up to 4 cards per row, card height from the longest roster
+  const rosters = S.teams.map(t => [
+    ...(t.cap ? [['C', 'CABEÇA DE CHAVE', t.cap]] : []),
+    ...t.stars.map(s => ['★', 'ESTRELA', s]),
+    ...t.players.map((p, j) => [String((t.cap ? 1 : 0) + t.stars.length + j + 1), 'JOGADOR', p])
+  ]);
+  const T = S.teams.length, cols = Math.min(T, 4), rowsN = Math.ceil(T / cols);
+  const maxE = Math.max(...rosters.map(r => r.length));
+  const rowH = maxE <= 4 ? 80 : maxE <= 8 ? 62 : 48, compact = rowH < 62;
+  const pad = 60, gap = 24, top = 285, ch = 152 + maxE * rowH + 8;
+  const W = 1600, H = top + rowsN * ch + (rowsN - 1) * gap + 135, c = document.createElement('canvas');
   c.width = W; c.height = H;
   const x = c.getContext('2d');
   const D = "'Unbounded','Arial Black',sans-serif", M = "'JetBrains Mono',Consolas,monospace";
@@ -1361,20 +1550,23 @@ async function renderImage(S) {
   sp(0); x.font = `900 104px ${D}`; glow(34); x.fillText('WEAK GG', W / 2, 198); glow(8); x.fillText('WEAK GG', W / 2, 198); flat();
   sp(6); x.font = `400 16px ${M}`; x.fillStyle = 'rgba(255,255,255,.55)'; x.fillText(`TIMES DEFINIDOS · ${S.when}`, W / 2, 240);
 
-  const pad = 60, gap = 24, cw = (W - pad * 2 - gap * 3) / 4, ch = 480, cy = 285;
+  const cw = (W - pad * 2 - gap * (cols - 1)) / cols;
   S.teams.forEach((t, i) => {
-    const cx = pad + i * (cw + gap);
+    const row = Math.floor(i / cols), inRow = Math.min(cols, T - row * cols); // short last row is centred
+    const cx = pad + (cols - inRow) * (cw + gap) / 2 + (i % cols) * (cw + gap), cy = top + row * (ch + gap);
     x.fillStyle = 'rgba(255,255,255,.03)'; x.fillRect(cx, cy, cw, ch);
     glow(22); x.strokeStyle = '#fff'; x.lineWidth = 2; x.strokeRect(cx, cy, cw, ch); flat();
-    x.textAlign = 'left'; sp(5); x.font = `600 14px ${M}`; x.fillStyle = 'rgba(255,255,255,.55)'; x.fillText(`TIME 0${i + 1}`, cx + 24, cy + 44);
+    x.textAlign = 'left'; sp(5); x.font = `600 14px ${M}`; x.fillStyle = 'rgba(255,255,255,.55)'; x.fillText(`TIME ${pad2(i + 1)}`, cx + 24, cy + 44);
     sp(0); x.fillStyle = '#fff'; fit(t.name, `900 {s}px ${D}`, 32, cw - 48); glow(14); x.fillText(t.name, cx + 24, cy + 96); flat();
     x.fillStyle = 'rgba(255,255,255,.2)'; x.fillRect(cx + 24, cy + 124, cw - 48, 1);
-    [['C', 'CABEÇA DE CHAVE', t.cap], ...t.stars.map(s => ['★', 'ESTRELA', s]), ...t.players.map((p, j) => [String(2 + t.stars.length + j), 'JOGADOR', p])].forEach(([ic, lab, nm], r) => {
-      const ry = cy + 152 + r * 80;
-      x.fillStyle = '#fff'; glow(10); x.fillRect(cx + 24, ry, 36, 36); flat();
-      x.fillStyle = '#000'; x.textAlign = 'center'; sp(0); x.font = `800 18px ${M}`; x.fillText(ic, cx + 42, ry + 25);
-      x.textAlign = 'left'; sp(4); x.fillStyle = 'rgba(255,255,255,.5)'; x.font = `400 11px ${M}`; x.fillText(lab, cx + 76, ry + 11);
-      sp(0); x.fillStyle = '#fff'; fit(nm || '', `600 {s}px ${M}`, 24, cw - 100); if (ic === '★') glow(12); x.fillText(nm || '', cx + 76, ry + 38); flat();
+    rosters[i].forEach(([ic, lab, nm], r) => {
+      const ry = cy + 152 + r * rowH, bs = compact ? 30 : 36;
+      x.fillStyle = '#fff'; glow(10); x.fillRect(cx + 24, ry, bs, bs); flat();
+      x.fillStyle = '#000'; x.textAlign = 'center'; sp(0); x.font = `800 ${compact ? 15 : 18}px ${M}`; x.fillText(ic, cx + 24 + bs / 2, ry + bs * .69);
+      x.textAlign = 'left';
+      if (!compact) { sp(4); x.fillStyle = 'rgba(255,255,255,.5)'; x.font = `400 11px ${M}`; x.fillText(lab, cx + 76, ry + 11); }
+      sp(0); x.fillStyle = '#fff'; fit(nm || '', `600 {s}px ${M}`, compact ? 20 : 24, cw - 100); if (ic === '★') glow(12);
+      x.fillText(nm || '', cx + (compact ? 68 : 76), ry + (compact ? 22 : 38)); flat();
     });
   });
 
@@ -1449,7 +1641,9 @@ $('#vBtn').onclick = async () => {
   else if (want.length >= 8 && h.startsWith(want)) { head = '<div class="vbig">✓ SORTEIO VERIFICADO</div>A impressão digital confere: os nomes e a semente são exatamente os que foram lacrados antes do sorteio.'; Sound.init(); Sound.pop(); }
   else head = '<div class="vbig">✕ NÃO CONFERE</div>O código do sorteio informado não bate com este código de verificação. Algo foi alterado — ou o código foi copiado errado.';
   show(`${head}<br><span style="color:var(--dim)">SHA-256: ${fmtHash(h)}</span>
-    <div class="vteams">${plan.teams.map((t, i) => `<div><b>${esc(t.name)}</b>C · ${esc(t.cap)}${t.stars.map(s => `<br>★ · ${esc(s)}`).join('')}${t.players.map(p => `<br>• · ${esc(p)}`).join('')}</div>`).join('')}</div>`);
+    <div class="vteams">${plan.teams.map(t => `<div><b>${esc(t.name)}</b>${[
+      ...(t.cap ? [`C · ${esc(t.cap)}`] : []), ...t.stars.map(s => `★ · ${esc(s)}`), ...t.players.map(p => `• · ${esc(p)}`)
+    ].join('<br>')}</div>`).join('')}</div>`);
 };
 (function prefillVerify() {
   // opening …#verificar?c=WGG1.…&h=… pre-fills the form
