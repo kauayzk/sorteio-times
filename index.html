@@ -557,6 +557,7 @@ body.fsidle .c-dot,body.fsidle .c-ring{opacity:0!important}
     <div class="st-tools">
       <button class="tool hash" id="hashChip" type="button" title="Código do sorteio — clique para copiar">#····</button>
       <button class="tool" id="fsBtn" type="button">Tela cheia</button>
+      <button class="tool" id="speedBtn" type="button" title="Velocidade do sorteio (tecla V)">1x</button>
       <button class="tool" id="autoBtn" type="button">Auto</button>
       <button class="tool on" id="soundBtn" type="button">Som</button>
       <button class="tool" id="exitBtn" type="button">Sair ✕</button>
@@ -1244,6 +1245,11 @@ $('#brClear').onclick = () => {
 const stage = $('#stage'), strip = $('#strip'), reelWrap = $('#reelWrap'), revealBtn = $('#revealBtn');
 const ABORT = Symbol('abort');
 let current = null, autoMode = false;
+// draw speed (1x–3x): every stage duration goes through T(), so the whole show scales together
+const SPEEDS = [1, 1.5, 2, 3];
+let speed = 1;
+try { const v = +localStorage.getItem('weakgg:speed'); if (SPEEDS.includes(v)) speed = v; } catch {}
+const T = ms => ms / speed;
 
 function openStage() {
   document.body.classList.add('staging');
@@ -1264,13 +1270,13 @@ async function bigMsg(k, t, s, hold = 1300) {
   const m = $('#bigMsg');
   m.querySelector('.bk').textContent = k; m.querySelector('.bs').textContent = s;
   const bt = m.querySelector('.bt'); bt.textContent = t;
-  m.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 250, fill: 'forwards' });
-  bt.animate([{ transform: 'scale(1.6)', filter: 'blur(20px)', opacity: 0, letterSpacing: '.3em' }, { transform: 'scale(1)', filter: 'blur(0)', opacity: 1, letterSpacing: '0em' }], { duration: 700, easing: 'cubic-bezier(.2,.8,.2,1)' });
-  await wait(hold);
-  bt.animate([{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(.85)', opacity: 0, filter: 'blur(10px)' }], { duration: 350, fill: 'forwards' });
-  await wait(250);
-  m.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, fill: 'forwards' });
-  await wait(300);
+  m.animate([{ opacity: 0 }, { opacity: 1 }], { duration: T(250), fill: 'forwards' });
+  bt.animate([{ transform: 'scale(1.6)', filter: 'blur(20px)', opacity: 0, letterSpacing: '.3em' }, { transform: 'scale(1)', filter: 'blur(0)', opacity: 1, letterSpacing: '0em' }], { duration: T(700), easing: 'cubic-bezier(.2,.8,.2,1)' });
+  await wait(T(hold));
+  bt.animate([{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(.85)', opacity: 0, filter: 'blur(10px)' }], { duration: T(350), fill: 'forwards' });
+  await wait(T(250));
+  m.animate([{ opacity: 1 }, { opacity: 0 }], { duration: T(300), fill: 'forwards' });
+  await wait(T(300));
   bt.getAnimations().forEach(a => a.cancel());
 }
 
@@ -1304,7 +1310,7 @@ function waitReveal(S) {
   return new Promise((res, rej) => {
     S.resolveReveal = res; S.rejectReveal = rej;
     revealBtn.disabled = false; revealBtn.classList.add('ready');
-    if (autoMode) S.autoT = setTimeout(triggerReveal, 1400);
+    if (autoMode) S.autoT = setTimeout(triggerReveal, T(1400));
   });
 }
 function triggerReveal() {
@@ -1327,7 +1333,7 @@ async function runDraw(data) {
     starPool: [...(data.stars || [])], playerPool: [...data.players]
   };
   current = S;
-  const sleep = async ms => { await wait(ms); if (S.aborted) throw ABORT; };
+  const sleep = async ms => { await wait(T(ms)); if (S.aborted) throw ABORT; };
 
   try {
     if (!(window.crypto && crypto.subtle)) { current = null; toast('Abra a página por https (ex: Vercel) para sortear'); return; }
@@ -1408,13 +1414,13 @@ async function runDraw(data) {
 async function showSeal(S) {
   const el = $('#seal');
   $('#sealFull').textContent = fmtHash(S.hash);
-  el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 400, fill: 'forwards' });
+  el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: T(400), fill: 'forwards' });
   Sound.whoosh();
-  await scramble($('#sealShort'), '#' + fmtHash(S.hash.slice(0, 8)), 1200);
+  await scramble($('#sealShort'), '#' + fmtHash(S.hash.slice(0, 8)), T(1200));
   Sound.pop();
-  await wait(3200);
-  el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 400, fill: 'forwards' });
-  await wait(400);
+  await wait(T(3200));
+  el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: T(400), fill: 'forwards' });
+  await wait(T(400));
 }
 
 async function setTarget(S, ti, R) {
@@ -1435,8 +1441,8 @@ async function setTarget(S, ti, R) {
   $('#chCap').innerHTML = info.join(' · ');
   $('#chStatus').textContent = 'aguardando';
   Sound.whoosh();
-  $('#chTeam').animate([{ opacity: 0, transform: 'translateY(20px)', filter: 'blur(10px)' }, { opacity: 1, transform: 'none', filter: 'blur(0)' }], { duration: 600, easing: 'cubic-bezier(.2,.8,.2,1)' });
-  await scramble($('#chTeam'), t.name, 700);
+  $('#chTeam').animate([{ opacity: 0, transform: 'translateY(20px)', filter: 'blur(10px)' }, { opacity: 1, transform: 'none', filter: 'blur(0)' }], { duration: T(600), easing: 'cubic-bezier(.2,.8,.2,1)' });
+  await scramble($('#chTeam'), t.name, T(700));
 }
 
 async function doPick(S, ti, R, pick, sleep) {
@@ -1451,8 +1457,8 @@ async function doPick(S, ti, R, pick, sleep) {
   if (poolSize === 1) {
     $('#chStatus').textContent = '';
     scramble($('#chStatus'), 'último restante · por eliminação', 700);
-    reelWrap.classList.add('charging'); Sound.riser(1.6); fx.target = 4;
-    let beats = 0; const bi = setInterval(() => { Sound.beat(); if (++beats > 1) clearInterval(bi); }, 600);
+    reelWrap.classList.add('charging'); Sound.riser(T(1600) / 1000); fx.target = 4;
+    let beats = 0; const bi = setInterval(() => { Sound.beat(); if (++beats > 1) clearInterval(bi); }, T(600));
     await sleep(1700);
     reelWrap.classList.remove('charging');
     strip.innerHTML = `<div class="ri q">· · ·</div><div class="ri">${esc(winner)}</div><div class="ri q">· · ·</div>`;
@@ -1460,7 +1466,7 @@ async function doPick(S, ti, R, pick, sleep) {
   } else {
     // charge-up
     scramble($('#chStatus'), 'sorteando', 600);
-    reelWrap.classList.add('charging'); Sound.riser(1.3); fx.target = 3;
+    reelWrap.classList.add('charging'); Sound.riser(T(1300) / 1000); fx.target = 3;
     await sleep(1300);
     reelWrap.classList.remove('charging');
 
@@ -1477,7 +1483,7 @@ async function doPick(S, ti, R, pick, sleep) {
     strip.innerHTML = names.map(nm => `<div class="ri">${esc(nm)}</div>`).join('');
     const h = rh();
     const endY = -(n - 2) * h, overY = endY - h * .44;
-    const dur = (R.type === 'star' ? 6400 : S.bracket ? 4200 : S.std ? 4800 : 5600) + rnd(900);
+    const dur = T((R.type === 'star' ? 6400 : S.bracket ? 4200 : S.std ? 4800 : 5600) + rnd(900));
     const anim = strip.animate([
       { transform: 'translateY(0px)', easing: 'cubic-bezier(.2,.55,.12,1)' },
       { transform: `translateY(${overY}px)`, offset: .84 },
@@ -1564,7 +1570,7 @@ async function flyTo(fromEl, slot, text) {
   const fr = f.getBoundingClientRect();
   const sx = a.left + a.width / 2 - fr.width / 2, sy = a.top + a.height / 2 - fr.height / 2;
   f.style.left = sx + 'px'; f.style.top = sy + 'px';
-  await wait(reduced ? 0 : 280);
+  await wait(reduced ? 0 : T(280));
   const b = target.getBoundingClientRect();
   const scale = Math.min(1, (b.height * 1.1) / fr.height);
   const dx = b.left + (fr.width * scale) / 2 - (sx + fr.width / 2), dy = b.top + b.height / 2 - (sy + fr.height / 2);
@@ -1573,7 +1579,7 @@ async function flyTo(fromEl, slot, text) {
     { transform: 'translate(0,0) scale(1)', opacity: 1 },
     { transform: `translate(${dx * .5}px,${dy * .5 - 60}px) scale(${(1 + scale) / 2})`, opacity: 1, offset: .5 },
     { transform: `translate(${dx}px,${dy}px) scale(${scale})`, opacity: .2 }
-  ], { duration: reduced ? 1 : 750, easing: 'cubic-bezier(.6,0,.2,1)', fill: 'forwards' }).finished;
+  ], { duration: reduced ? 1 : T(750), easing: 'cubic-bezier(.6,0,.2,1)', fill: 'forwards' }).finished;
   f.remove();
 }
 
@@ -1799,10 +1805,21 @@ addEventListener('keydown', e => {
   if ((e.code === 'Space' || e.key === 'Enter') && !e.target.closest('button, summary')) { e.preventDefault(); triggerReveal(); }
   if (e.key === 'Escape') $('#exitBtn').click();
 });
+const speedBtn = $('#speedBtn');
+const showSpeed = () => { speedBtn.textContent = `${String(speed).replace('.', ',')}x`; speedBtn.classList.toggle('on', speed > 1); };
+const cycleSpeed = () => {
+  speed = SPEEDS[(SPEEDS.indexOf(speed) + 1) % SPEEDS.length];
+  try { localStorage.setItem('weakgg:speed', speed); } catch {}
+  showSpeed(); Sound.init(); Sound.tick();
+  toast(speed > 1 ? `Sorteio ${String(speed).replace('.', ',')}x mais rápido` : 'Velocidade normal');
+};
+speedBtn.onclick = cycleSpeed;
+addEventListener('keydown', e => { if (stage.classList.contains('on') && (e.key === 'v' || e.key === 'V') && !e.target.closest('input,textarea')) cycleSpeed(); });
+showSpeed();
 $('#autoBtn').onclick = e => {
   autoMode = !autoMode; e.currentTarget.classList.toggle('on', autoMode);
   toast(autoMode ? 'Modo automático ligado' : 'Modo automático desligado');
-  if (autoMode && current && current.resolveReveal) current.autoT = setTimeout(triggerReveal, 800);
+  if (autoMode && current && current.resolveReveal) current.autoT = setTimeout(triggerReveal, T(800));
   if (!autoMode && current) clearTimeout(current.autoT);
 };
 $('#soundBtn').onclick = e => { Sound.on = !Sound.on; Sound.init(); e.currentTarget.classList.toggle('on', Sound.on); };
