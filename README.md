@@ -1,96 +1,103 @@
 # Sorteios WEAK GG
 
-Página estática (`index.html` + `og.png`) — Creation of KZK.
+Sorteio de times ao vivo, com suspense de transmissão e resultado **lacrado e verificável**.
+Feito para campeonatos e partidas entre amigos: cabeças de chave e estrelas para equilibrar
+os times, sorteio padrão de 2 a 8 times e chaveamento eliminatório de até 32 times.
 
-## Subir na Vercel
+**Creation of KZK** — Kauã de Araújo Rocha
 
-**Opção 1 — CLI (mais rápido)**
+![Abertura](docs/screenshots/1-abertura.png)
+
+## O que a página faz
+
+| Modo | Para quê | Como funciona |
+|---|---|---|
+| **WEAK GG** | 4 times equilibrados | Cada time tem 1 cabeça de chave (definido por você), 2 estrelas e 1 jogador sorteados |
+| **Padrão** | Dividir uma lista em times | De 2 a 8 times, até 64 nomes; um jogador por time a cada rodada |
+| **Confrontos** | Montar um campeonato | De 2 a 32 times sorteados num chaveamento eliminatório, com folgas quando preciso |
+
+Em todos os modos:
+
+- **Sorteio com suspense:** roleta que desacelera, batimento cardíaco, tela escurecendo, efeitos
+  de luz e partículas em preto e branco.
+- **Lacre verificável:** antes de revelar qualquer nome, a página mostra o *código do sorteio*
+  (SHA-256). No final revela a semente, e qualquer pessoa confere em **Verificar sorteio** que
+  nada foi trocado. Detalhes em [docs/verificacao.md](docs/verificacao.md).
+- **Controles do palco:** revelar no clique ou no **Auto**, velocidade **1x / 1,5x / 2x / 3x**,
+  tela cheia para transmissão, som liga/desliga.
+- **Resultado pronto para compartilhar:** imagem (baixar ou copiar e colar no Discord) e texto
+  com os times ou os jogos, já com os códigos de verificação.
+- **Chaveamento jogável:** clique no vencedor de cada jogo para ele avançar até o campeão; o
+  último chaveamento fica salvo e pode ser reaberto.
+- **Nada vai para servidor:** os nomes ficam só no navegador de quem está sorteando.
+
+Passo a passo de cada modo em [docs/como-funciona.md](docs/como-funciona.md).
+
+| Sorteio ao vivo | Resultado |
+|---|---|
+| ![Sorteio ao vivo](docs/screenshots/2-sorteio-ao-vivo.png) | ![Resultado](docs/screenshots/3-resultado.png) |
+
+![Chaveamento](docs/screenshots/4-chaveamento.png)
+
+## Rodar no computador
+
+É um site estático, sem build e sem dependências. O lacre usa a Web Crypto do navegador, que só
+funciona em `https` ou em `localhost`, então abra por um servidor local em vez de clicar duas
+vezes no arquivo:
 
 ```bash
-npm i -g vercel
-cd weak-gg-sorteio
-vercel --prod
+python -m http.server 8000
 ```
 
-Na primeira vez ele pede login e o nome do projeto; aceite os padrões
-(não há build, é só HTML). Para atualizar depois, rode `vercel --prod` de novo.
+Depois acesse `http://localhost:8000`.
 
-**Opção 2 — GitHub**
+## Publicar
 
-1. Crie um repositório e envie esta pasta.
-2. Em vercel.com → *Add New → Project* → importe o repositório.
-3. Framework Preset: **Other**, sem build command. Deploy.
+O site está pronto para a Vercel (ou qualquer hospedagem de arquivos estáticos).
+Passo a passo, prévia do link no Discord e domínio próprio em [docs/deploy.md](docs/deploy.md).
 
-### Depois do primeiro deploy (prévia do link no Discord)
+## Estrutura
 
-O Discord só mostra a imagem de prévia com endereço completo. Troque nas duas linhas
-`og:image` e `twitter:image` do `index.html`:
-
-```html
-<meta property="og:image" content="/og.png">
+```
+index.html                 página (marcação) — carrega os arquivos abaixo
+assets/
+  css/
+    base.css               cores, camadas do fundo, cursor, botões
+    home.css               abertura, letreiros, seções, formulário, rodapé
+    stage.css              palco do sorteio, roleta, quadros dos times, tela final
+    modes.css              abas, modo Padrão e chaveamento
+    overlays.css           janelas, verificação, lacre, efeitos por cima
+    responsive.css         tablet, celular e movimento reduzido (sempre por último)
+  js/                      carregados nesta ordem, compartilham as mesmas declarações
+    core.js                utilidades, aleatoriedade, lacre e plano do sorteio
+    effects.js             texto embaralhado, som sintetizado, partículas, cursor, scroll
+    setup-weakgg.js        formulário WEAK GG, nomes salvos, colar lista
+    setup-padrao.js        abas e formulário do modo Padrão
+    setup-confrontos.js    formulário do modo Confrontos
+    draw.js                motor do sorteio: lacre, rodadas, roleta, revelação, final
+    bracket.js             chaveamento: desenho, linhas, vencedores, reabrir
+    stage-controls.js      botões e teclas do palco, copiar resultado, tela cheia
+    export.js              imagem do resultado (PNG)
+    verify.js              verificação de um sorteio antigo
+  img/
+    og.png                 prévia do link (Open Graph)
+docs/
+  como-funciona.md         uso de cada modo
+  verificacao.md           como o lacre e a verificação funcionam
+  deploy.md                publicação na Vercel
+  screenshots/             prints usados neste README
 ```
 
-por, por exemplo:
+## Atalhos no palco
 
-```html
-<meta property="og:image" content="https://SEU-PROJETO.vercel.app/og.png">
-```
+| Tecla | Ação |
+|---|---|
+| Espaço / Enter | Revelar |
+| V | Mudar a velocidade |
+| F | Tela cheia |
+| Esc | Sair |
 
-e rode `vercel --prod` de novo.
+## Como foi feito
 
-### Domínio próprio (opcional)
-
-Na Vercel: projeto → *Settings → Domains* → adicione o domínio (ex: `sorteio.seudominio.com`)
-e crie no seu provedor de DNS o registro que a Vercel mostrar (CNAME para `cname.vercel-dns.com`).
-
-## Como funciona o sorteio
-
-A página tem três abas em "Monte o sorteio".
-
-### Confrontos (chaveamento)
-
-- Cole os nomes dos times (de 2 a 32) e, se quiser, o nome do campeonato.
-- O chaveamento é eliminatório simples, do tamanho da próxima potência de 2 (2, 4, 8, 16 ou 32 vagas).
-  Se faltar time para completar, as vagas que sobram viram folga: o time avança direto.
-- O sorteio põe um time em cada jogo da 1ª fase e depois completa os adversários; quais jogos
-  ficam com folga também é sorteado.
-- No final aparece o chaveamento completo (as duas metades se encontrando na final), com imagem
-  para baixar, texto com todos os jogos e a mesma verificação (o código leva `"mode":"bracket"`).
-- Clique no vencedor de cada jogo para ele avançar; clique de novo para desfazer. Se um resultado
-  anterior mudar, os jogos seguintes que dependiam dele voltam a ficar em aberto.
-- Os resultados ficam salvos neste navegador; o botão "Abrir último chaveamento" (na aba Confrontos)
-  reabre o chaveamento de onde parou. A imagem e o texto copiado levam os vencedores e o campeão.
-
-### Padrão
-
-- Escolha de 2 a 8 times e cole os nomes (um por linha ou separados por vírgula, até 64).
-- Nomes dos times são opcionais (sem nome vira `TIME 01`, `TIME 02`…).
-- A cada rodada cada time recebe um jogador, com a ordem dos times sorteada de novo.
-  Se a divisão não for exata, os times que ficam com um jogador a mais também são sorteados.
-- Usa o mesmo lacre e a mesma verificação do modo WEAK GG (o código leva `"mode":"std"`).
-
-### WEAK GG
-
-- Cabeças de chave ficam fixos em cada time.
-- Cada time: 1 cabeça de chave + 2 estrelas + 1 jogador.
-- Rodadas 1 e 2: as 8 estrelas (1 por time em cada). Rodada 3: os 4 jogadores (1 por time).
-- A ordem dos times é sorteada a cada rodada.
-
-### Lacre e verificação
-
-1. Ao iniciar, o navegador gera uma semente secreta de 256 bits (`crypto.getRandomValues`).
-2. Monta o **código de verificação**: `WGG1.` + base64url do JSON `{seed, teams, caps, stars, players}`.
-3. Mostra para todos o **código do sorteio** = SHA-256 desse código, antes de qualquer revelação.
-4. Todo o resultado vem da semente: números = SHA-256(`"<seed>:<n>"`), n = 0, 1, 2…, lidos como uint32
-   big-endian, com amostragem por rejeição (sem viés).
-5. No final o código de verificação é revelado. Em **Verificar sorteio** qualquer um cola os dois
-   códigos: a página confere o SHA-256 e refaz o sorteio inteiro.
-
-## Recursos
-
-- **Colar lista**: botão no formulário, ou cole uma lista (linhas ou vírgulas) direto em qualquer campo.
-  Para times, use `Time - Cabeça de chave` por linha.
-- Os últimos nomes ficam salvos **só neste navegador** (Limpar tudo apaga).
-- Resultado: copiar texto, **baixar imagem** ou **copiar imagem** (para colar no Discord).
-- Palco: **Espaço/Enter** revela, **F** tela cheia (controles somem sozinhos), **Esc** sai.
-  Botões **Auto** e **Som** no topo; clicar no `#código` copia o código do sorteio.
+Projeto idealizado, especificado e testado por mim, desenvolvido com um agente de IA
+(Claude Code) a partir de prompts, revisão de cada entrega e feedback iterativo.

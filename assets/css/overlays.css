@@ -1,0 +1,44 @@
+/* Sorteios WEAK GG — paste modal, verify section, seal, star stamp, fullscreen idle */
+/* ---------- paste modal ---------- */
+.field textarea{width:100%;background:rgba(255,255,255,.02);border:1px solid var(--line);padding:10px 12px;font:inherit;font-size:13px;line-height:1.6;color:#fff;outline:none;resize:vertical;border-radius:0;transition:border-color .3s,box-shadow .3s}
+.field textarea:focus{border-color:#fff;box-shadow:0 0 18px rgba(255,255,255,.15)}
+.field textarea::placeholder{color:rgba(255,255,255,.2)}
+.modal{position:fixed;inset:0;z-index:140;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.8);backdrop-filter:blur(8px)}
+.modal.on{display:flex;animation:fadeIn .3s}
+@keyframes fadeIn{from{opacity:0}}
+.modal-box{width:min(620px,100%);max-height:calc(100vh - 32px);overflow:auto;background:#000;border:1px solid #fff;box-shadow:var(--box-glow);padding:26px 24px;animation:boxIn .45s cubic-bezier(.2,.8,.2,1)}
+@keyframes boxIn{from{transform:translateY(30px) scale(.97);opacity:0}}
+.modal-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.modal-head h3{font-family:var(--display);font-weight:900;font-size:22px;text-shadow:var(--glow-sm)}
+.modal-hint{margin:10px 0 6px;font-size:11.5px;color:var(--mute);line-height:1.7}
+.modal-actions{margin-top:22px;display:flex;justify-content:flex-end}
+
+/* ---------- verify ---------- */
+.verify-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.verify-out{margin-top:24px;border:1px solid var(--line);padding:20px;font-size:12.5px;line-height:1.8;display:none}
+.verify-out.on{display:block;animation:boxIn .5s cubic-bezier(.2,.8,.2,1)}
+.verify-out .vbig{font-family:var(--display);font-weight:900;font-size:20px;margin-bottom:10px;text-shadow:var(--glow-sm)}
+.verify-out .vteams{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px}
+.verify-out .vteams div{border:1px solid var(--line);padding:10px 12px;color:var(--mute)}
+.verify-out .vteams b{display:block;color:#fff;margin-bottom:4px}
+
+/* ---------- seal (commitment) ---------- */
+#seal{position:fixed;inset:0;z-index:91;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:16px;background:rgba(0,0,0,.9);opacity:0;pointer-events:none}
+#seal .sk{font-size:12px;letter-spacing:.5em;margin-right:-.5em;color:var(--mute);text-transform:uppercase}
+#seal .sh{font-family:var(--display);font-weight:900;font-size:clamp(34px,8vw,96px);margin:16px 0 6px;text-shadow:var(--glow);letter-spacing:.06em}
+#seal .sf{font-size:clamp(10px,1.6vw,14px);letter-spacing:.12em;color:#fff;word-break:break-all;max-width:760px;text-shadow:var(--glow-sm)}
+#seal .sn{margin-top:22px;font-size:11px;letter-spacing:.2em;color:var(--mute);text-transform:uppercase;max-width:620px;line-height:1.9}
+.tool.hash{font-family:var(--mono);letter-spacing:.12em;text-transform:none}
+.proof{margin:18px auto 0;max-width:820px;border:1px solid var(--line);padding:14px 16px;font-size:11px;line-height:1.8;color:var(--mute);text-align:left;word-break:break-all}
+.proof b{color:#fff}
+.proof code{color:#fff;font-family:var(--mono)}
+
+/* ---------- star stamp / blackout ---------- */
+#stamp{position:fixed;left:50%;top:45%;z-index:93;pointer-events:none;font-size:min(60vw,520px);line-height:1;color:#fff;text-shadow:var(--glow);opacity:0;transform:translate(-50%,-50%)}
+#stage.blackout .boards,#stage.blackout .ch-for,#stage.blackout .ch-team,#stage.blackout .ch-cap,#stage.blackout .pool,#stage.blackout .reveal-btn,#stage.blackout .ch-hint,#stage.blackout .st-top{opacity:.06;transition:opacity .6s}
+.boards,.ch-for,.ch-team,.ch-cap,.pool,.reveal-btn,.ch-hint,.st-top{transition:opacity .4s}
+
+/* ---------- fullscreen idle ---------- */
+#stage.fs.idle .st-top,#stage.fs.idle .ch-hint{opacity:0}
+body.fsidle .c-dot,body.fsidle .c-ring{opacity:0!important}
+
