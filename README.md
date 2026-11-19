@@ -45,7 +45,17 @@ e crie no seu provedor de DNS o registro que a Vercel mostrar (CNAME para `cname
 
 ## Como funciona o sorteio
 
-A página tem duas abas em "Monte o sorteio".
+A página tem três abas em "Monte o sorteio".
+
+### Confrontos (chaveamento)
+
+- Cole os nomes dos times (de 2 a 32) e, se quiser, o nome do campeonato.
+- O chaveamento é eliminatório simples, do tamanho da próxima potência de 2 (2, 4, 8, 16 ou 32 vagas).
+  Se faltar time para completar, as vagas que sobram viram folga: o time avança direto.
+- O sorteio põe um time em cada jogo da 1ª fase e depois completa os adversários; quais jogos
+  ficam com folga também é sorteado.
+- No final aparece o chaveamento completo (as duas metades se encontrando na final), com imagem
+  para baixar, texto com todos os jogos e a mesma verificação (o código leva `"mode":"bracket"`).
 
 ### Padrão
 

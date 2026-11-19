@@ -286,6 +286,35 @@ body.staging{overflow:hidden}
 .std-teamnames{display:grid;grid-template-columns:1fr 1fr;gap:4px 18px}
 .std-teamnames .field{margin-top:6px}
 
+/* ---------- bracket (chaveamento) ---------- */
+.bracket-wrap{display:none;flex:none;position:relative;z-index:2;width:100%;overflow-x:auto;padding:10px 22px 30px;scrollbar-width:thin}
+#stage.done.is-bracket .bracket-wrap{display:block}
+#stage.done.is-bracket .boards{display:none}
+.bracket{position:relative;display:flex;gap:var(--br-gap,44px);width:max-content;min-width:100%;justify-content:center;margin:0 auto;padding:4px 0}
+.br-lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.br-lines path{fill:none;stroke:rgba(255,255,255,.55);stroke-width:1.5;filter:drop-shadow(0 0 4px rgba(255,255,255,.6))}
+.br-lines path.draw{stroke-dasharray:var(--len);stroke-dashoffset:var(--len);animation:brDraw .9s cubic-bezier(.6,0,.2,1) forwards}
+@keyframes brDraw{to{stroke-dashoffset:0}}
+.br-col{display:flex;flex-direction:column;width:var(--br-col,200px);flex:none}
+.br-head{text-align:center;font-size:10px;letter-spacing:.35em;color:var(--mute);margin-bottom:14px;white-space:nowrap}
+.br-col.final .br-head{color:#fff;text-shadow:var(--glow-sm)}
+.br-matches{flex:1;display:flex;flex-direction:column;justify-content:space-around;gap:14px}
+.br-m{position:relative;border:1px solid var(--line);background:rgba(0,0,0,.75);opacity:0;transform:translateY(16px)}
+.br-m.in{animation:brIn .6s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes brIn{to{opacity:1;transform:none}}
+.br-n{position:absolute;top:-8px;left:10px;background:#000;padding:0 6px;font-size:9px;letter-spacing:.25em;color:var(--mute)}
+.br-t{display:flex;align-items:center;gap:8px;padding:9px 12px;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.br-t+.br-t{border-top:1px solid var(--faint)}
+.br-t.tbd{color:var(--dim);font-weight:400;font-size:11px;letter-spacing:.08em}
+.br-t.bye{color:var(--dim);font-weight:400;font-size:11px;letter-spacing:.2em}
+.br-t.adv{color:#fff;text-shadow:var(--glow-sm)}
+.br-col.final .br-m{border-color:#fff;box-shadow:var(--box-glow)}
+.br-champ{margin-top:18px;text-align:center;border:1px dashed rgba(255,255,255,.4);padding:14px 10px;opacity:0}
+.br-champ.in{animation:brIn .6s cubic-bezier(.2,.8,.2,1) forwards}
+.br-champ b{display:block;font-family:var(--display);font-weight:900;font-size:22px;text-shadow:var(--glow);margin-bottom:4px}
+.br-champ span{font-size:10px;letter-spacing:.3em;color:var(--mute)}
+.br-title{text-align:center;font-family:var(--display);font-weight:800;font-size:clamp(16px,2.4vw,24px);letter-spacing:.2em;margin:0 0 26px;text-shadow:var(--glow-sm);text-transform:uppercase}
+
 /* ---------- paste modal ---------- */
 .field textarea{width:100%;background:rgba(255,255,255,.02);border:1px solid var(--line);padding:10px 12px;font:inherit;font-size:13px;line-height:1.6;color:#fff;outline:none;resize:vertical;border-radius:0;transition:border-color .3s,box-shadow .3s}
 .field textarea:focus{border-color:#fff;box-shadow:0 0 18px rgba(255,255,255,.15)}
@@ -385,7 +414,7 @@ body.fsidle .c-dot,body.fsidle .c-ring{opacity:0!important}
       <div class="kicker" id="heroKicker">// sistema de sorteio imparcial</div>
       <div class="pre">SORTEIOS</div>
       <h1 class="title glitch" data-text="WEAK GG" id="title">WEAK GG</h1>
-      <p class="spec"><b>WEAK GG</b> · cabeças de chave &amp; estrelas &nbsp;/&nbsp; <b>Padrão</b> · de <b>2</b> a <b>8</b> times</p>
+      <p class="spec"><b>WEAK GG</b> · cabeças de chave &amp; estrelas &nbsp;/&nbsp; <b>Padrão</b> · de <b>2</b> a <b>8</b> times &nbsp;/&nbsp; <b>Confrontos</b> · chaveamento</p>
       <div class="cta"><a href="#setup" class="btn magnetic"><span class="shine"></span>Montar sorteio ↓</a></div>
       <div class="credit-hero">Creation of <b>KZK</b></div>
     </div>
@@ -418,6 +447,29 @@ body.fsidle .c-dot,body.fsidle .c-ring{opacity:0!important}
     <div class="tabs reveal" role="tablist" aria-label="Tipo de sorteio">
       <button class="tab on" type="button" role="tab" data-tab="seed" aria-selected="true"><b>WEAK GG</b><small>4 times · cabeças de chave · estrelas</small></button>
       <button class="tab" type="button" role="tab" data-tab="std" aria-selected="false"><b>PADRÃO</b><small>só os nomes · 2 a 8 times</small></button>
+      <button class="tab" type="button" role="tab" data-tab="bracket" aria-selected="false"><b>CONFRONTOS</b><small>chaveamento · 2 a 32 times</small></button>
+    </div>
+
+    <div class="panel" id="bracketPanel" hidden>
+      <div class="std-grid">
+        <div>
+          <div class="sub-h">Times <small id="brNum">0 TIMES</small></div>
+          <label class="field"><span>Um time por linha (ou separados por vírgula)</span><textarea id="brTeams" rows="12" placeholder="Alpha Wolves&#10;Black Mamba&#10;Nocturne&#10;Zero Gravity&#10;…"></textarea></label>
+          <div class="std-split" id="brSplit"></div>
+        </div>
+        <div>
+          <div class="sub-h">Campeonato <small>OPCIONAL</small></div>
+          <label class="field"><span>Nome do campeonato</span><input id="brTitle" maxlength="40" placeholder="Ex: Copa WEAK GG" autocomplete="off"></label>
+          <p class="std-split" style="margin-top:22px">Os times são sorteados nas vagas da primeira fase. Se o número de times não for 2, 4, 8, 16 ou 32, alguns times avançam direto (folga) — e quem fica de folga também é sorteado.</p>
+        </div>
+      </div>
+      <div class="setup-actions">
+        <div class="left">
+          <button class="btn ghost" id="brDemo" type="button">Preencher exemplo</button>
+          <button class="btn ghost" id="brClear" type="button">Limpar tudo</button>
+        </div>
+        <button class="btn go magnetic" id="brStart" type="button"><span class="shine"></span>Sortear confrontos ⟶</button>
+      </div>
     </div>
 
     <div class="panel" id="stdPanel" hidden>
@@ -521,6 +573,7 @@ body.fsidle .c-dot,body.fsidle .c-ring{opacity:0!important}
   </div>
 
   <div class="boards" id="boards"></div>
+  <div class="bracket-wrap" id="bracketWrap"></div>
 
   <div class="final-actions">
     <button class="btn ghost" id="imgBtn" type="button">Baixar imagem</button>
@@ -585,9 +638,11 @@ const sha256 = async str => new Uint8Array(await crypto.subtle.digest('SHA-256',
 const fmtHash = h => h.toUpperCase().match(/.{1,4}/g).join(' ');
 function b64uEncode(str) { let s = ''; enc.encode(str).forEach(x => s += String.fromCharCode(x)); return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
 function b64uDecode(s) { s = s.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; return new TextDecoder().decode(Uint8Array.from(atob(s), c => c.charCodeAt(0))); }
-// standard draws add mode:"std" and carry only {seed, teams, players}
-const makeCode = (seed, d) => 'WGG1.' + b64uEncode(JSON.stringify(d.mode === 'std'
-  ? { mode: 'std', seed, teams: d.teams, players: d.players }
+// standard draws add mode:"std" and carry only {seed, teams, players};
+// bracket draws add mode:"bracket" + title, with teams = the first-round matches and players = the teams
+const makeCode = (seed, d) => 'WGG1.' + b64uEncode(JSON.stringify(
+  d.mode === 'std' ? { mode: 'std', seed, teams: d.teams, players: d.players }
+  : d.mode === 'bracket' ? { mode: 'bracket', seed, title: d.title || '', teams: d.teams, players: d.players }
   : { seed, teams: d.teams, caps: d.caps, stars: d.stars, players: d.players }));
 function readCode(code) {
   if (!code.startsWith('WGG1.')) throw new Error('formato');
@@ -597,6 +652,9 @@ function readCode(code) {
   if (o.mode === 'std') {
     ok = typeof o.seed === 'string' && strs(o.teams) && strs(o.players)
       && o.teams.length >= 2 && o.teams.length <= 8 && o.players.length >= o.teams.length && o.players.length <= 64;
+  } else if (o.mode === 'bracket') {
+    ok = typeof o.seed === 'string' && typeof o.title === 'string' && strs(o.teams) && strs(o.players)
+      && o.players.length >= 2 && o.players.length <= 32 && o.teams.length === brSize(o.players.length) / 2;
   } else {
     // older draws used 4 stars + 8 players; the rounds follow from the list sizes, so both verify
     ok = typeof o.seed === 'string' && ['teams', 'caps', 'stars', 'players'].every(k => strs(o[k]))
@@ -612,9 +670,10 @@ async function planDraw(seed, d) {
   let p = 0;
   const rint = n => { const lim = Math.floor(0x100000000 / n) * n; let x; do { if (p >= st.length) throw new Error('stream'); x = st[p++]; } while (x >= lim); return x % n; };
   const shuf = arr => { const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = rint(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; };
-  if (d.mode === 'std') {
+  if (d.mode === 'std' || d.mode === 'bracket') {
     // one pick per team each round, team order shuffled every round; in the last
     // (partial) round the shuffle also decides which teams get the extra players
+    // (for a bracket: which first-round matches stay with a single team, i.e. byes)
     const T = d.teams.length, pool = [...d.players], rounds = [];
     while (pool.length) {
       const order = shuf([...Array(T).keys()]).slice(0, Math.min(T, pool.length));
@@ -1034,9 +1093,10 @@ $('#pApply').onclick = () => {
 const TAB_KEY = 'weakgg:tab';
 function setTab(t, animate = true) {
   $$('.tab').forEach(b => { const on = b.dataset.tab === t; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
-  const show = $(t === 'std' ? '#stdPanel' : '#seedPanel');
-  $(t === 'std' ? '#seedPanel' : '#stdPanel').hidden = true;
-  show.hidden = false;
+  const panels = { seed: '#seedPanel', std: '#stdPanel', bracket: '#bracketPanel' };
+  if (!panels[t]) t = 'seed';
+  Object.entries(panels).forEach(([k, sel]) => { $(sel).hidden = k !== t; });
+  const show = $(panels[t]);
   if (animate && !reduced) { show.classList.remove('enter'); void show.offsetWidth; show.classList.add('enter'); }
   $$('.reveal', show).forEach(el => observeReveal(el));
   try { localStorage.setItem(TAB_KEY, t); } catch {}
@@ -1111,8 +1171,61 @@ $('#stdClear').onclick = () => {
   if (o && typeof o.players === 'string') $('#stdPlayers').value = o.players;
   setStdCount(o && o.n >= 2 && o.n <= 8 ? o.n : 2, o && Array.isArray(o.teams) ? o.teams : []);
   let t = 'seed';
-  try { t = localStorage.getItem(TAB_KEY) === 'std' ? 'std' : 'seed'; } catch {}
+  try { t = localStorage.getItem(TAB_KEY) || 'seed'; } catch {}
   setTab(t, false);
+})();
+
+/* ---------- bracket draw: teams drawn into the first-round slots, byes when not a power of two ---------- */
+const BR_KEY = 'weakgg:bracket:v1', BR_MAX = 32;
+const PHASES = { 1: 'FINAL', 2: 'SEMIFINAL', 4: 'QUARTAS DE FINAL', 8: 'OITAVAS DE FINAL', 16: '16-AVOS DE FINAL' };
+const brSize = n => { let b = 2; while (b < n) b *= 2; return b; };
+const brNames = () => splitList($('#brTeams').value);
+function updateBrSplit() {
+  const N = brNames().length, el = $('#brSplit');
+  $('#brNum').textContent = `${N} ${N === 1 ? 'TIME' : 'TIMES'}`;
+  if (N > BR_MAX) { el.innerHTML = `Máximo de <b>${BR_MAX}</b> times.`; return; }
+  if (N < 2) { el.innerHTML = N ? 'Coloque pelo menos <b>2</b> times.' : 'Cole ou digite os nomes dos times.'; return; }
+  const B = brSize(N), M = B / 2, byes = B - N, games = M - byes;
+  el.innerHTML = `1ª fase: <b>${PHASES[M].toLowerCase()}</b> · <b>${games}</b> ${games > 1 ? 'jogos' : 'jogo'}`
+    + (byes ? ` e <b>${byes}</b> ${byes > 1 ? 'times avançam' : 'time avança'} de folga.` : '.');
+}
+function saveBr() {
+  try { localStorage.setItem(BR_KEY, JSON.stringify({ teams: $('#brTeams').value, title: $('#brTitle').value })); } catch {}
+}
+let brSaveT;
+$('#bracketPanel').addEventListener('input', e => {
+  const f = e.target.closest('.field'); if (f) f.classList.remove('err');
+  if (e.target.id === 'brTeams') updateBrSplit();
+  clearTimeout(brSaveT); brSaveT = setTimeout(saveBr, 300);
+});
+function collectBr() {
+  const names = brNames(), area = $('#brTeams').closest('.field');
+  const fail = msg => { area.classList.add('err'); toast(msg); $('#brTeams').focus(); return null; };
+  if (names.length < 2) return fail('Coloque pelo menos 2 times');
+  if (names.length > BR_MAX) return fail(`Máximo de ${BR_MAX} times`);
+  const seen = new Set();
+  for (const n of names) { const k = n.toLowerCase(); if (seen.has(k)) return fail(`Time repetido: ${n}`); seen.add(k); }
+  const M = brSize(names.length) / 2;
+  // each first-round match is a "board" that receives up to two teams
+  return { mode: 'bracket', title: $('#brTitle').value.trim().replace(/\s+/g, ' '), teams: Array.from({ length: M }, (_, i) => `JOGO ${pad2(i + 1)}`), players: names };
+}
+$('#brStart').onclick = () => { const data = collectBr(); if (data) { saveBr(); Sound.init(); runDraw(data); } };
+$('#brDemo').onclick = () => {
+  $('#brTeams').value = ['Alpha Wolves', 'Black Mamba', 'Nocturne', 'Zero Gravity', 'Red Vipers', 'Iron Ghosts', 'Night Owls', 'Storm Riders', 'Phoenix', 'Kraken'].join('\n');
+  $('#brTitle').value = 'Copa WEAK GG';
+  $('#brTeams').closest('.field').classList.remove('err');
+  updateBrSplit(); saveBr(); toast('Exemplo preenchido');
+};
+$('#brClear').onclick = () => {
+  $('#brTeams').value = ''; $('#brTitle').value = ''; updateBrSplit();
+  try { localStorage.removeItem(BR_KEY); } catch {}
+  toast('Campos limpos');
+};
+(function restoreBr() {
+  let o = null;
+  try { o = JSON.parse(localStorage.getItem(BR_KEY) || 'null'); } catch {}
+  if (o) { if (typeof o.teams === 'string') $('#brTeams').value = o.teams; if (typeof o.title === 'string') $('#brTitle').value = o.title; }
+  updateBrSplit();
 })();
 
 /* ================= DRAW ENGINE ================= */
@@ -1156,10 +1269,10 @@ function buildBoards(S) {
   b.style.setProperty('--cols', Math.min(S.teams.length, 4));
   b.innerHTML = S.teams.map((t, i) => `
     <div class="board" data-i="${i}">
-      <div class="b-head"><span class="b-num">TIME ${pad2(i + 1)}</span><span class="b-name">${esc(t.name)}</span></div>
+      <div class="b-head"><span class="b-num">${S.bracket ? 'CONFRONTO' : `TIME ${pad2(i + 1)}`}</span><span class="b-name">${esc(t.name)}</span></div>
       ${t.cap ? '<div class="slot cap"><em>C</em><span>???</span></div>' : ''}
       ${'<div class="slot star"><em>★</em><span>???</span></div>'.repeat(nStar)}
-      ${Array.from({ length: nPl }, (_, j) => `<div class="slot pl"><em>${(t.cap ? 1 : 0) + nStar + j + 1}</em><span>???</span></div>`).join('')}
+      ${Array.from({ length: nPl }, (_, j) => `<div class="slot pl"><em>${S.bracket ? 'AB'[j] : (t.cap ? 1 : 0) + nStar + j + 1}</em><span>???</span></div>`).join('')}
     </div>`).join('');
 }
 const boardEl = i => $(`#boards .board[data-i="${i}"]`);
@@ -1196,7 +1309,8 @@ async function runDraw(data) {
   if (current) current.aborted = true;
   const S = {
     data, aborted: false, done: 0, log: [],
-    std: data.mode === 'std',
+    std: data.mode === 'std' || data.mode === 'bracket', // both: plain names, no seeds or stars
+    bracket: data.mode === 'bracket',
     teams: data.teams.map((name, i) => ({ name, cap: data.caps ? data.caps[i] : null, stars: [], players: [] })),
     starPool: [...(data.stars || [])], playerPool: [...data.players]
   };
@@ -1217,6 +1331,9 @@ async function runDraw(data) {
     $('#hashChip').textContent = '#' + S.hash.slice(0, 8).toUpperCase();
     buildBoards(S);
     setProgress(S);
+    stage.classList.toggle('is-bracket', S.bracket);
+    $('#bracketWrap').innerHTML = '';
+    $('#chFor').textContent = S.bracket ? 'O PRÓXIMO TIME VAI PARA O' : 'O PRÓXIMO JOGADOR VAI PARA';
     $('#chFor').style.opacity = 0; $('#chTeam').textContent = ''; $('#chCap').textContent = ''; $('#chStatus').textContent = '';
     $('#pool').innerHTML = ''; strip.innerHTML = '<div class="ri q">· · ·</div><div class="ri q">???</div><div class="ri q">· · ·</div>';
     strip.style.transform = ''; reelWrap.classList.remove('locked', 'charging');
@@ -1232,7 +1349,7 @@ async function runDraw(data) {
     fx.target = 1;
 
     // teams enter (with their captains in the WEAK GG format)
-    $('#stRound').textContent = S.std ? 'TIMES' : 'CABEÇAS DE CHAVE';
+    $('#stRound').textContent = S.bracket ? 'CONFRONTOS' : S.std ? 'TIMES' : 'CABEÇAS DE CHAVE';
     for (let i = 0; i < S.teams.length; i++) {
       const b = boardEl(i); b.classList.add('in'); Sound.whoosh();
       await sleep(S.std ? 180 : 260);
@@ -1242,7 +1359,10 @@ async function runDraw(data) {
     await sleep(900);
 
     const nR = S.plan.rounds.length;
-    const rounds = S.std
+    const rounds = S.bracket
+      ? S.plan.rounds.map((pr, r) => ({ type: 'player', k: `sorteio ${r + 1} de ${nR}`, t: `LADO ${'AB'[r]}`,
+          s: r === nR - 1 ? 'fechando os confrontos' : 'um time em cada jogo' }))
+      : S.std
       ? S.plan.rounds.map((pr, r) => ({ type: 'player', k: `rodada ${r + 1} de ${nR}`, t: `RODADA ${r + 1}`,
           s: r === nR - 1 ? 'fechando os times' : `${pr.picks.length} jogadores` }))
       : [
@@ -1257,7 +1377,7 @@ async function runDraw(data) {
       Sound.beat();
       await bigMsg(R.k, R.t, R.s, 1500); if (S.aborted) throw ABORT;
       $('#stRound').textContent = S.std ? R.k.toUpperCase() : `${R.k.toUpperCase()} · ${R.t}`;
-      $('#reelTag').textContent = R.type === 'star' ? '★ JOGADOR ESTRELA' : '◆ JOGADOR';
+      $('#reelTag').textContent = R.type === 'star' ? '★ JOGADOR ESTRELA' : S.bracket ? '◆ TIME' : '◆ JOGADOR';
       for (let k = 0; k < order.length; k++) {
         const ti = order[k];
         await setTarget(S, ti, R);
@@ -1298,7 +1418,8 @@ async function setTarget(S, ti, R) {
   const info = [];
   if (t.cap) info.push(`Cabeça de chave: <b>${esc(t.cap)}</b>`);
   if (t.stars.length) info.push(`Estrela${t.stars.length > 1 ? 's' : ''}: <b>${t.stars.map(esc).join(', ')}</b>`);
-  if (S.std) info.push(t.players.length ? `Já tem: <b>${t.players.map(esc).join(', ')}</b>` : 'Primeiro jogador do time');
+  if (S.bracket) info.push(t.players.length ? `Adversário: <b>${esc(t.players[0])}</b>` : 'Primeiro time do confronto');
+  else if (S.std) info.push(t.players.length ? `Já tem: <b>${t.players.map(esc).join(', ')}</b>` : 'Primeiro jogador do time');
   $('#chCap').innerHTML = info.join(' · ');
   $('#chStatus').textContent = 'aguardando';
   Sound.whoosh();
@@ -1344,7 +1465,7 @@ async function doPick(S, ti, R, pick, sleep) {
     strip.innerHTML = names.map(nm => `<div class="ri">${esc(nm)}</div>`).join('');
     const h = rh();
     const endY = -(n - 2) * h, overY = endY - h * .44;
-    const dur = (R.type === 'star' ? 6400 : S.std ? 4800 : 5600) + rnd(900);
+    const dur = (R.type === 'star' ? 6400 : S.bracket ? 4200 : S.std ? 4800 : 5600) + rnd(900);
     const anim = strip.animate([
       { transform: 'translateY(0px)', easing: 'cubic-bezier(.2,.55,.12,1)' },
       { transform: `translateY(${overY}px)`, offset: .84 },
@@ -1403,7 +1524,7 @@ async function doPick(S, ti, R, pick, sleep) {
   burst(rr.left + rr.width / 2, rr.top + rr.height / 2, 110, 11);
   shockwave(rr.left + rr.width / 2, rr.top + rr.height / 2);
   const chip = chipFor(winner); if (chip) chip.classList.add('taken', 'just');
-  scramble($('#chStatus'), R.type === 'star' ? '★ estrela definida' : 'jogador definido', 500);
+  scramble($('#chStatus'), R.type === 'star' ? '★ estrela definida' : S.bracket ? 'time definido' : 'jogador definido', 500);
   S.log.push(`${S.teams[ti].name} ← ${winner}  (sorteado entre ${poolSize}: ${[...pool, winner].sort((a, b) => a.localeCompare(b)).join(', ')})`);
   await sleep(1500);
 
@@ -1449,21 +1570,112 @@ async function finale(S) {
   $$('#boards .slot:not(.filled)').forEach(s => s.remove()); // teams that ended one player short
   $('#stRound').textContent = 'CONCLUÍDO';
   Sound.fanfare();
-  await bigMsg('sorteio', 'FIM', 'times definidos', 1400);
+  await bigMsg('sorteio', 'FIM', S.bracket ? 'chaveamento definido' : 'times definidos', 1400);
   stage.classList.add('done');
   stage.scrollTop = 0;
+  if (S.bracket) renderBracket(S);
   const now = new Date();
   S.when = now.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
   $('#finalMeta').innerHTML = `${esc(S.when)} · sorteio lacrado e verificável<br>Creation of KZK`;
   $('#proof').innerHTML = `<b>Código do sorteio</b> (mostrado no início): <code>${fmtHash(S.hash)}</code><br>
     <b>Código de verificação</b> (semente revelada): <code>${esc(S.code)}</code><br>
     Para conferir: cole os dois em <b>Verificar sorteio</b>, no fim da página inicial. O “Copiar resultado” já leva os dois.`;
-  scramble($('#finalTitle'), 'TIMES DEFINIDOS', 1100);
+  scramble($('#finalTitle'), S.bracket ? 'CHAVEAMENTO' : 'TIMES DEFINIDOS', 1100);
   $('#logList').innerHTML = S.log.map(l => `<li>${esc(l)}</li>`).join('');
   flash(.7);
   for (let i = 0; i < 5; i++) setTimeout(() => burst(Math.random() * innerWidth, Math.random() * innerHeight * .6, 70, 10), i * 260);
   shockwave(innerWidth / 2, innerHeight / 3, 1600);
 }
+
+/* ---------- bracket view ----------
+   rounds[0] = the drawn first-round matches (a match with one team is a bye);
+   each later match is fed by matches 2i and 2i+1 of the previous round.
+   Shown as two halves meeting at the final in the middle. */
+function bracketModel(teams) {
+  const first = teams.map((t, i) => ({ n: i + 1, a: { name: t.players[0] }, b: t.players[1] ? { name: t.players[1] } : { bye: true }, bye: t.players.length < 2 }));
+  const rounds = [first];
+  let n = first.length;
+  const from = f => f.bye ? { name: f.a.name, adv: true } : { tbd: `Vencedor J${pad2(f.n)}` };
+  while (rounds[rounds.length - 1].length > 1) {
+    const prev = rounds[rounds.length - 1], cur = [];
+    for (let i = 0; i < prev.length; i += 2) cur.push({ n: ++n, a: from(prev[i]), b: from(prev[i + 1]) });
+    rounds.push(cur);
+  }
+  return rounds;
+}
+// columns left → right: left halves of each round, the final, then right halves in reverse
+function bracketColumns(rounds) {
+  const R = rounds.length, cols = [];
+  const half = (r, right) => { const h = rounds[r].length / 2; return rounds[r].map((m, i) => ({ m, r, i })).slice(right ? h : 0, right ? undefined : h); };
+  for (let r = 0; r < R - 1; r++) cols.push({ r, items: half(r, false) });
+  cols.push({ r: R - 1, items: [{ m: rounds[R - 1][0], r: R - 1, i: 0 }], final: true });
+  for (let r = R - 2; r >= 0; r--) cols.push({ r, items: half(r, true) });
+  return cols;
+}
+function renderBracket(S) {
+  const rounds = bracketModel(S.teams), cols = bracketColumns(rounds);
+  const slot = s => s.name ? `<div class="br-t${s.adv ? ' adv' : ''}">${esc(s.name)}</div>`
+    : s.bye ? '<div class="br-t bye">FOLGA</div>' : `<div class="br-t tbd">${esc(s.tbd)}</div>`;
+  const wrap = $('#bracketWrap');
+  wrap.innerHTML = (S.data.title ? `<div class="br-title">${esc(S.data.title)}</div>` : '') +
+    `<div class="bracket" id="bracket"><svg class="br-lines" id="brLines"></svg>${cols.map((c, ci) => `
+      <div class="br-col${c.final ? ' final' : ''}">
+        <div class="br-head">${PHASES[rounds[c.r].length]}</div>
+        <div class="br-matches">${c.items.map(({ m, r, i }) => `
+          <div class="br-m" data-r="${r}" data-i="${i}" style="animation-delay:${Math.min(ci, cols.length - 1 - ci) * 140 + i * 40}ms">
+            <div class="br-n">JOGO ${pad2(m.n)}</div>${slot(m.a)}${slot(m.b)}
+          </div>`).join('')}
+          ${c.final ? '<div class="br-champ"><b>???</b><span>CAMPEÃO</span></div>' : ''}
+        </div>
+      </div>`).join('')}</div>`;
+  fitBracket(cols.length);
+  $$('.br-m', wrap).forEach(m => m.classList.add('in'));
+  const champ = $('.br-champ', wrap);
+  if (champ) { champ.style.animationDelay = (cols.length / 2) * 140 + 300 + 'ms'; champ.classList.add('in'); }
+  requestAnimationFrame(() => drawBracketLines(rounds, true));
+}
+// shrink columns/gaps to fit the screen (down to a readable minimum); past that the bracket scrolls sideways
+function fitBracket(n) {
+  const wrap = $('#bracketWrap'), br = $('#bracket'); if (!br) return;
+  const avail = wrap.clientWidth - 44;
+  const gap = Math.max(22, Math.min(44, (avail - n * 200) / Math.max(1, n - 1)));
+  const col = Math.max(150, Math.min(200, (avail - gap * (n - 1)) / n));
+  br.style.setProperty('--br-gap', gap + 'px'); br.style.setProperty('--br-col', col + 'px');
+}
+function drawBracketLines(rounds, animate) {
+  const br = $('#bracket'), svg = $('#brLines');
+  if (!br || !svg) return;
+  // layout boxes (offset*), not getBoundingClientRect: the cards are still sliding in when this runs
+  const rect = (r, i) => {
+    const el = $(`.br-m[data-r="${r}"][data-i="${i}"]`, br);
+    return el && { left: el.offsetLeft, top: el.offsetTop, right: el.offsetLeft + el.offsetWidth, height: el.offsetHeight };
+  };
+  let paths = '';
+  for (let r = 1; r < rounds.length; r++) {
+    rounds[r].forEach((_, i) => {
+      const T = rect(r, i);
+      [2 * i, 2 * i + 1].forEach(fi => {
+        const F = rect(r - 1, fi); if (!F || !T) return;
+        const leftSide = F.left < T.left;
+        const sx = leftSide ? F.right : F.left, sy = F.top + F.height / 2;
+        const ex = leftSide ? T.left : T.right, ey = T.top + T.height / 2;
+        const mx = (sx + ex) / 2;
+        paths += `<path data-r="${r}" d="M${sx},${sy} H${mx} V${ey} H${ex}"/>`;
+      });
+    });
+  }
+  svg.innerHTML = paths;
+  if (animate && !reduced) $$('path', svg).forEach(p => {
+    p.style.setProperty('--len', p.getTotalLength());
+    p.style.animationDelay = (+p.dataset.r * 160 + 250) + 'ms';
+    p.classList.add('draw');
+  });
+}
+new ResizeObserver(() => {
+  if (!current || !current.bracket || !stage.classList.contains('done')) return;
+  const rounds = bracketModel(current.teams);
+  fitBracket(bracketColumns(rounds).length); drawBracketLines(rounds, false);
+}).observe(stage);
 
 /* ---------- stage controls ---------- */
 revealBtn.onclick = triggerReveal;
@@ -1484,7 +1696,7 @@ $('#exitBtn').onclick = () => {
   const S = current;
   if (S && !stage.classList.contains('done') && !confirm('Cancelar o sorteio em andamento?')) return;
   if (S) { S.aborted = true; clearTimeout(S.autoT); if (S.rejectReveal) { const r = S.rejectReveal; S.resolveReveal = S.rejectReveal = null; r(ABORT); } }
-  if (S) setTab(S.std ? 'std' : 'seed', false); // come back to the form this draw came from
+  if (S) setTab(S.bracket ? 'bracket' : S.std ? 'std' : 'seed', false); // come back to the form this draw came from
   current = null;
   closeStage();
   $('#setup').scrollIntoView();
@@ -1493,8 +1705,16 @@ $('#editBtn').onclick = () => { $('#exitBtn').click(); };
 $('#againBtn').onclick = () => { const d = current && current.data; if (d) runDraw(d); };
 $('#copyBtn').onclick = async () => {
   const S = current; if (!S) return;
-  const lines = [`SORTEIOS WEAK GG — ${S.when}`, ''];
-  S.teams.forEach((t, i) => {
+  const lines = [`SORTEIOS WEAK GG${S.bracket ? ' · CONFRONTOS' : ''} — ${S.when}`, ''];
+  if (S.bracket) {
+    if (S.data.title) lines.splice(1, 0, S.data.title.toUpperCase());
+    const side = s => s.name || s.tbd;
+    bracketModel(S.teams).forEach(round => {
+      lines.push(PHASES[round.length]);
+      round.forEach(m => lines.push(m.bye ? `  J${pad2(m.n)}  ${m.a.name} avança direto (folga)` : `  J${pad2(m.n)}  ${side(m.a)} x ${side(m.b)}`));
+      lines.push('');
+    });
+  } else S.teams.forEach((t, i) => {
     const label = `TIME ${pad2(i + 1)}`;
     lines.push(t.name === label ? label : `${label} · ${t.name}`);
     if (t.cap) lines.push(`  ♛ ${t.cap} (cabeça de chave)`);
@@ -1519,6 +1739,7 @@ $('#hashChip').onclick = async () => {
 /* ---------- result image (canvas → PNG) ---------- */
 async function renderImage(S) {
   try { await document.fonts.ready; } catch {}
+  if (S.bracket) return renderBracketImage(S);
   // layout grows with the draw: up to 4 cards per row, card height from the longest roster
   const rosters = S.teams.map(t => [
     ...(t.cap ? [['C', 'CABEÇA DE CHAVE', t.cap]] : []),
@@ -1529,26 +1750,8 @@ async function renderImage(S) {
   const maxE = Math.max(...rosters.map(r => r.length));
   const rowH = maxE <= 4 ? 80 : maxE <= 8 ? 62 : 48, compact = rowH < 62;
   const pad = 60, gap = 24, top = 285, ch = 152 + maxE * rowH + 8;
-  const W = 1600, H = top + rowsN * ch + (rowsN - 1) * gap + 135, c = document.createElement('canvas');
-  c.width = W; c.height = H;
-  const x = c.getContext('2d');
-  const D = "'Unbounded','Arial Black',sans-serif", M = "'JetBrains Mono',Consolas,monospace";
-  const sp = px => { if ('letterSpacing' in x) x.letterSpacing = px + 'px'; };
-  const glow = b => { x.shadowColor = 'rgba(255,255,255,.85)'; x.shadowBlur = b; };
-  const flat = () => { x.shadowBlur = 0; };
-  const fit = (txt, font, size, maxW) => { let s = size; do { x.font = font.replace('{s}', s); } while (x.measureText(txt).width > maxW && --s > 9); };
-
-  x.fillStyle = '#000'; x.fillRect(0, 0, W, H);
-  const g = x.createRadialGradient(W / 2, H * .3, 0, W / 2, H * .3, W * .6);
-  g.addColorStop(0, 'rgba(255,255,255,.1)'); g.addColorStop(1, 'rgba(255,255,255,0)');
-  x.fillStyle = g; x.fillRect(0, 0, W, H);
-  for (let i = 0; i < 260; i++) { x.fillStyle = `rgba(255,255,255,${Math.random() * .35})`; x.fillRect(Math.random() * W, Math.random() * H, 1.5, 1.5); }
-  x.fillStyle = 'rgba(255,255,255,.025)'; for (let y = 0; y < H; y += 3) x.fillRect(0, y, W, 1);
-
-  x.textAlign = 'center'; x.fillStyle = '#fff';
-  sp(18); x.font = `300 26px ${D}`; glow(10); x.fillText('SORTEIOS', W / 2, 92);
-  sp(0); x.font = `900 104px ${D}`; glow(34); x.fillText('WEAK GG', W / 2, 198); glow(8); x.fillText('WEAK GG', W / 2, 198); flat();
-  sp(6); x.font = `400 16px ${M}`; x.fillStyle = 'rgba(255,255,255,.55)'; x.fillText(`TIMES DEFINIDOS · ${S.when}`, W / 2, 240);
+  const W = 1600, H = top + rowsN * ch + (rowsN - 1) * gap + 135;
+  const { c, x, sp, glow, flat, fit, D, M } = imageBase(W, H, S, `TIMES DEFINIDOS · ${S.when}`);
 
   const cw = (W - pad * 2 - gap * (cols - 1)) / cols;
   S.teams.forEach((t, i) => {
@@ -1569,11 +1772,93 @@ async function renderImage(S) {
       x.fillText(nm || '', cx + (compact ? 68 : 76), ry + (compact ? 22 : 38)); flat();
     });
   });
+  return c;
+}
+// shared look for every exported image: background, WEAK GG header, code + credit footer
+function imageBase(W, H, S, subtitle) {
+  const c = document.createElement('canvas');
+  c.width = W; c.height = H;
+  const x = c.getContext('2d');
+  const D = "'Unbounded','Arial Black',sans-serif", M = "'JetBrains Mono',Consolas,monospace";
+  const sp = px => { if ('letterSpacing' in x) x.letterSpacing = px + 'px'; };
+  const glow = b => { x.shadowColor = 'rgba(255,255,255,.85)'; x.shadowBlur = b; };
+  const flat = () => { x.shadowBlur = 0; };
+  const fit = (txt, font, size, maxW) => { let s = size; do { x.font = font.replace('{s}', s); } while (x.measureText(txt).width > maxW && --s > 9); };
 
+  x.fillStyle = '#000'; x.fillRect(0, 0, W, H);
+  const g = x.createRadialGradient(W / 2, Math.min(H * .3, 400), 0, W / 2, Math.min(H * .3, 400), W * .6);
+  g.addColorStop(0, 'rgba(255,255,255,.1)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+  x.fillStyle = g; x.fillRect(0, 0, W, H);
+  for (let i = 0; i < 260 * Math.max(1, W * H / 1440000); i++) { x.fillStyle = `rgba(255,255,255,${Math.random() * .35})`; x.fillRect(Math.random() * W, Math.random() * H, 1.5, 1.5); }
+  x.fillStyle = 'rgba(255,255,255,.025)'; for (let y = 0; y < H; y += 3) x.fillRect(0, y, W, 1);
+
+  x.textAlign = 'center'; x.fillStyle = '#fff';
+  sp(18); x.font = `300 26px ${D}`; glow(10); x.fillText('SORTEIOS', W / 2, 92);
+  sp(0); x.font = `900 104px ${D}`; glow(34); x.fillText('WEAK GG', W / 2, 198); glow(8); x.fillText('WEAK GG', W / 2, 198); flat();
+  sp(6); x.font = `400 16px ${M}`; x.fillStyle = 'rgba(255,255,255,.55)'; x.fillText(subtitle, W / 2, 240);
+
+  const pad = 60;
   x.textAlign = 'left'; sp(3); x.font = `400 13px ${M}`; x.fillStyle = 'rgba(255,255,255,.45)';
   x.fillText(`CÓDIGO DO SORTEIO #${fmtHash(S.hash.slice(0, 16))}`, pad, H - 46);
   x.textAlign = 'right'; sp(8); x.font = `300 18px ${D}`; x.fillStyle = '#fff'; glow(10); x.fillText('CREATION OF KZK', W - pad, H - 44); flat();
-  sp(0);
+  sp(0); x.textAlign = 'left';
+  return { c, x, sp, glow, flat, fit, D, M };
+}
+// bracket image: same column layout as the page (halves meeting at the final)
+function renderBracketImage(S) {
+  const rounds = bracketModel(S.teams), cols = bracketColumns(rounds);
+  const colW = 250, gapX = 54, cardH = 76, head = 44;
+  const k0 = Math.max(...cols.map(col => col.items.length));
+  const colH = Math.max(k0 * (cardH + 30), 240);
+  const contentW = cols.length * colW + (cols.length - 1) * gapX;
+  const W = Math.max(1600, contentW + 160), x0 = (W - contentW) / 2;
+  const top = S.data.title ? 330 : 290, H = top + head + colH + 210;
+  const { c, x, sp, glow, flat, fit, D, M } = imageBase(W, H, S, `CHAVEAMENTO · ${S.when}`);
+  if (S.data.title) { x.textAlign = 'center'; sp(10); x.fillStyle = '#fff'; fit(S.data.title.toUpperCase(), `800 {s}px ${D}`, 26, W - 200); glow(10); x.fillText(S.data.title.toUpperCase(), W / 2, 288); flat(); sp(0); }
+
+  const pos = {};
+  cols.forEach((col, ci) => {
+    const cx = x0 + ci * (colW + gapX);
+    x.textAlign = 'center'; sp(5); x.font = `400 12px ${M}`; x.fillStyle = col.final ? '#fff' : 'rgba(255,255,255,.55)';
+    x.fillText(PHASES[rounds[col.r].length], cx + colW / 2, top + 16); sp(0);
+    col.items.forEach(({ r, i }, j) => {
+      const cy = top + head + (2 * j + 1) / (2 * col.items.length) * colH - cardH / 2;
+      pos[`${r}-${i}`] = { l: cx, r: cx + colW, y: cy + cardH / 2, top: cy };
+    });
+  });
+  // connectors first so the cards sit on top
+  x.strokeStyle = 'rgba(255,255,255,.55)'; x.lineWidth = 1.5; glow(6);
+  for (let r = 1; r < rounds.length; r++) rounds[r].forEach((_, i) => {
+    const T = pos[`${r}-${i}`];
+    [2 * i, 2 * i + 1].forEach(fi => {
+      const F = pos[`${r - 1}-${fi}`], left = F.l < T.l;
+      const sx = left ? F.r : F.l, ex = left ? T.l : T.r, mx = (sx + ex) / 2;
+      x.beginPath(); x.moveTo(sx, F.y); x.lineTo(mx, F.y); x.lineTo(mx, T.y); x.lineTo(ex, T.y); x.stroke();
+    });
+  });
+  flat();
+  cols.forEach(col => col.items.forEach(({ m, r, i }) => {
+    const p = pos[`${r}-${i}`], fin = col.final;
+    x.fillStyle = '#000'; x.fillRect(p.l, p.top, colW, cardH);
+    if (fin) glow(22);
+    x.strokeStyle = fin ? '#fff' : 'rgba(255,255,255,.35)'; x.lineWidth = fin ? 2 : 1; x.strokeRect(p.l, p.top, colW, cardH); flat();
+    x.fillStyle = 'rgba(255,255,255,.12)'; x.fillRect(p.l + 1, p.top + cardH / 2, colW - 2, 1);
+    x.fillStyle = '#000'; x.fillRect(p.l + 10, p.top - 8, 70, 14);
+    x.textAlign = 'left'; sp(3); x.font = `400 10px ${M}`; x.fillStyle = 'rgba(255,255,255,.55)'; x.fillText(`JOGO ${pad2(m.n)}`, p.l + 16, p.top + 3); sp(0);
+    [m.a, m.b].forEach((s, k) => {
+      const ty = p.top + (k ? cardH * .75 : cardH * .25) + 6;
+      const txt = s.name || (s.bye ? 'FOLGA' : s.tbd);
+      x.fillStyle = s.name ? '#fff' : 'rgba(255,255,255,.35)';
+      fit(txt, s.name ? `600 {s}px ${M}` : `400 {s}px ${M}`, s.name ? 17 : 13, colW - 28);
+      if (s.adv) glow(8);
+      x.fillText(txt, p.l + 14, ty); flat();
+    });
+  }));
+  // champion box under the final
+  const f = pos[`${rounds.length - 1}-0`];
+  x.setLineDash([6, 5]); x.strokeStyle = 'rgba(255,255,255,.45)'; x.strokeRect(f.l + 30, f.top + cardH + 30, colW - 60, 70); x.setLineDash([]);
+  x.textAlign = 'center'; x.fillStyle = '#fff'; x.font = `900 24px ${D}`; glow(14); x.fillText('???', f.l + colW / 2, f.top + cardH + 64); flat();
+  sp(5); x.font = `400 11px ${M}`; x.fillStyle = 'rgba(255,255,255,.55)'; x.fillText('CAMPEÃO', f.l + colW / 2, f.top + cardH + 86); sp(0);
   return c;
 }
 const imgBlob = async () => { const c = await renderImage(current); return new Promise(r => c.toBlob(r, 'image/png')); };
@@ -1641,7 +1926,10 @@ $('#vBtn').onclick = async () => {
   else if (want.length >= 8 && h.startsWith(want)) { head = '<div class="vbig">✓ SORTEIO VERIFICADO</div>A impressão digital confere: os nomes e a semente são exatamente os que foram lacrados antes do sorteio.'; Sound.init(); Sound.pop(); }
   else head = '<div class="vbig">✕ NÃO CONFERE</div>O código do sorteio informado não bate com este código de verificação. Algo foi alterado — ou o código foi copiado errado.';
   show(`${head}<br><span style="color:var(--dim)">SHA-256: ${fmtHash(h)}</span>
-    <div class="vteams">${plan.teams.map(t => `<div><b>${esc(t.name)}</b>${[
+    ${o.mode === 'bracket' ? `<div style="margin-top:14px;color:#fff">${esc(o.title || 'Chaveamento')} · ${PHASES[plan.teams.length]}</div>` : ''}
+    <div class="vteams">${o.mode === 'bracket'
+      ? bracketModel(plan.teams)[0].map(m => `<div><b>JOGO ${pad2(m.n)}</b>${esc(m.a.name)}<br>${m.bye ? 'folga — avança direto' : `x ${esc(m.b.name)}`}</div>`).join('')
+      : plan.teams.map(t => `<div><b>${esc(t.name)}</b>${[
       ...(t.cap ? [`C · ${esc(t.cap)}`] : []), ...t.stars.map(s => `★ · ${esc(s)}`), ...t.players.map(p => `• · ${esc(p)}`)
     ].join('<br>')}</div>`).join('')}</div>`);
 };
