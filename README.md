@@ -56,6 +56,10 @@ A página tem três abas em "Monte o sorteio".
   ficam com folga também é sorteado.
 - No final aparece o chaveamento completo (as duas metades se encontrando na final), com imagem
   para baixar, texto com todos os jogos e a mesma verificação (o código leva `"mode":"bracket"`).
+- Clique no vencedor de cada jogo para ele avançar; clique de novo para desfazer. Se um resultado
+  anterior mudar, os jogos seguintes que dependiam dele voltam a ficar em aberto.
+- Os resultados ficam salvos neste navegador; o botão "Abrir último chaveamento" (na aba Confrontos)
+  reabre o chaveamento de onde parou. A imagem e o texto copiado levam os vencedores e o campeão.
 
 ### Padrão
 
